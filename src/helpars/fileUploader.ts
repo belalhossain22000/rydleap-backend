@@ -7,11 +7,8 @@ const storage = multer.diskStorage({
     cb(null, path.join(process.cwd(), "uploads"));
   },
   filename: async function (req, file, cb) {
-    const userName = await prisma.rider.findUnique({
-      where: { email: req.user.email },
-    });
 
-    cb(null, userName?.name + file.originalname);
+    cb(null, file.originalname);
   },
 });
 

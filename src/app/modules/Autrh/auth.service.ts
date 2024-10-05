@@ -131,65 +131,6 @@ const forgotPassword = async (payload: { email: string }) => {
     config.jwt.reset_pass_secret as Secret,
     config.jwt.reset_pass_token_expires_in as string
   );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   
   const resetPassLink =
     config.reset_pass_link + `?userId=${userData.id}&token=${resetPassToken}`;

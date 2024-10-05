@@ -19,7 +19,7 @@ router.get("/", userController.getUsers);
 // *!profile user
 router.put(
   "/profile",
-  validateRequest(UserValidation.userUpdateSchema),
+  // validateRequest(UserValidation.userUpdateSchema),
   auth(UserRole.ADMIN, UserRole.USER),
   userController.updateProfile
 );

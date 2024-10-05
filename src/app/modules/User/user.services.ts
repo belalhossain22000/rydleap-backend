@@ -11,6 +11,7 @@ import httpStatus from "http-status";
 
 // Create a new User in the database.
 const createUserIntoDb = async (payload: any) => {
+  
   const isPhoneNumberExist = await prisma.oTP.findUnique({
     where: { phoneNumber: payload.phoneNumber },
   });
