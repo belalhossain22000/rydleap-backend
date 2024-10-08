@@ -8,10 +8,12 @@ import { Prisma, UserRole, UserStatus } from "@prisma/client";
 import { userSearchAbleFields } from "./user.costant";
 import config from "../../../config";
 import httpStatus from "http-status";
+import { AuthServices } from "../Auth/auth.service";
+import { jwtHelpers } from "../../../helpars/jwtHelpers";
+import { Secret } from "jsonwebtoken";
 
 // Create a new User in the database.
 const createUserIntoDb = async (payload: any) => {
-  
   const isPhoneNumberExist = await prisma.oTP.findUnique({
     where: { phoneNumber: payload.phoneNumber },
   });
@@ -32,7 +34,7 @@ const createUserIntoDb = async (payload: any) => {
       `User already exists with this  ${payload.email}`
     );
   }
-  const isUserExistWithPhoneNumber = await prisma.user.findUnique({
+  const isUserExistWithPhoneNumber = await prisma.user.findFirst({
     where: {
       phoneNumber: payload.phoneNumber,
     },
@@ -51,10 +53,57 @@ const createUserIntoDb = async (payload: any) => {
   );
 
   const result = await prisma.user.create({
-    data: { ...payload, password: hashedPassword },
+    data: { ...payload, password: hashedPassword, isPhoenVerified: true },
   });
 
-  return result;
+  if (!result) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User creation failed");
+  }
+
+  const { password, ...withoutPasswordUser } = result;
+
+  return withoutPasswordUser;
+};
+
+const socialLogin = async (payload: any) => {
+  // Check if the user exists in the database
+  let user = await prisma.user.findUnique({
+    where: { email: payload.email },
+  });
+  const loginData = {
+    email: payload.email,
+    password: payload.password,
+  };
+  if (user) {
+    const accessToken = jwtHelpers.generateToken(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
+      config.jwt.jwt_secret as Secret,
+      config.jwt.expires_in as string
+    );
+
+    return accessToken;
+  } else {
+    user = await prisma.user.create({
+      data: {
+        ...payload,
+      },
+    });
+    const accessToken = jwtHelpers.generateToken(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
+      config.jwt.jwt_secret as Secret,
+      config.jwt.expires_in as string
+    );
+
+    return accessToken;
+  }
 };
 
 // reterive all users from the database
@@ -161,4 +210,5 @@ export const userService = {
   getUsersFromDb,
   updateProfile,
   updateUserIntoDb,
+  socialLogin,
 };

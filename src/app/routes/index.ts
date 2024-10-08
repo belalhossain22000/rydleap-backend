@@ -1,6 +1,6 @@
 import express from "express";
 import { userRoutes } from "../modules/User/user.route";
-import { AuthRoutes } from "../modules/Autrh/auth.routes";
+import { AuthRoutes } from "../modules/Auth/auth.routes";
 import { SendMessageRoutes } from "../modules/otp/otp.route";
 // import { RiderVehicleInfoRoutes } from "../modules/riderVehicleInfo/riderVehicleInfo.route";
 import { rideRoute } from "../modules/ride/ride.route";

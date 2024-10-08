@@ -13,6 +13,11 @@ router.post(
   "/register",
   userController.createUser
 );
+// create user
+router.post(
+  "/social",
+  userController.socialLogin
+);
 // *!get all  user
 router.get("/", userController.getUsers);
 
