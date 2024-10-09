@@ -15,6 +15,11 @@ router.post(
   RiderVehicleInfoController.createRiderVehicleInfo
 );
 router.get(
+  "/",
+  auth(UserRole.ADMIN, UserRole.RIDER, UserRole.USER),
+  RiderVehicleInfoController.getAllRiderVehicleInfo
+);
+router.get(
   "/get-my-vehicle-info",
   auth(UserRole.ADMIN, UserRole.RIDER, UserRole.USER),
   RiderVehicleInfoController.getRiderVehicleInfo
@@ -26,7 +31,7 @@ router.put(
   RiderVehicleInfoController.updateRiderVehicleInfo
 );
 router.delete(
-  "/delete-my-vehicle-info",
+  "/delete-vehicle-info",
   auth(UserRole.ADMIN, UserRole.RIDER, UserRole.USER),
   RiderVehicleInfoController.deleteRiderVehicleInfo
 );

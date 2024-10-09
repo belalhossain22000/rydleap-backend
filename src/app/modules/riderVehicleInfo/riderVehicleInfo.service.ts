@@ -4,6 +4,10 @@ import httpStatus from "http-status";
 import config from "../../../config";
 import prisma from "../../../shared/prisma";
 import { ObjectId } from "mongodb";
+import { Prisma } from "@prisma/client";
+import { paginationHelper } from "../../../helpars/paginationHelper";
+import { IPaginationOptions } from "../../interfaces/paginations";
+import { IVehicleInfoFilterRequest } from "./vehicleInfo.interface";
 
 // create vehivle information
 const createRiderVehicleInfoIntoDb = async (req: Request, user: any) => {
@@ -61,6 +65,92 @@ const createRiderVehicleInfoIntoDb = async (req: Request, user: any) => {
     );
   }
   return result;
+};
+
+const getAllRiderVehicleInfosFromDb = async (
+  user: any,
+  params: IVehicleInfoFilterRequest,
+  options: IPaginationOptions
+) => {
+  // Ensure the rider exists
+  const rider = await prisma.user.findUnique({
+    where: { id: user.id },
+  });
+
+  if (!rider) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Rider not found");
+  }
+
+  // Destructure pagination values (page, limit, skip)
+  const { page, limit, skip } = paginationHelper.calculatePagination(options);
+
+  // Destructure search term and other filters from the params
+  const { searchTerm, ...filterData } = params;
+
+  // Array to hold filter conditions
+  const andConditions: Prisma.RiderVehicleInfoWhereInput[] = [];
+
+  // Search logic (for example, vehicleMake, vehicleModel)
+  if (searchTerm) {
+    andConditions.push({
+      OR: ["vehicleMake", "vehicleModel", "vehicleLicensePlateNumber"].map(
+        (field) => ({
+          [field]: {
+            contains: searchTerm,
+            mode: "insensitive",
+          },
+        })
+      ),
+    });
+  }
+
+  // Add other filter conditions if any are provided
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: (filterData as any)[key],
+        },
+      })),
+    });
+  }
+
+  // Combine all conditions into where clause
+  const whereConditions: Prisma.RiderVehicleInfoWhereInput =
+    andConditions.length > 0
+      ? { AND: andConditions, userId: user.id }
+      : { userId: user.id };
+
+  // Fetch the vehicle information with pagination, sorting, and filtering
+  const vehicleInfos = await prisma.riderVehicleInfo.findMany({
+    where: whereConditions,
+    skip: skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? { [options.sortBy]: options.sortOrder }
+        : { createdAt: "desc" },
+  });
+
+  // If no results, throw an error
+  if (!vehicleInfos.length) {
+    throw new ApiError(httpStatus.NOT_FOUND, "No vehicle information found");
+  }
+
+  // Count the total number of vehicle records matching the conditions
+  const total = await prisma.riderVehicleInfo.count({
+    where: whereConditions,
+  });
+
+  // Return paginated result
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: vehicleInfos,
+  };
 };
 
 // get vehicle info by rider /user id
@@ -196,4 +286,5 @@ export const VehicleInfoService = {
   getRiderVehicleInfoFromDb,
   deleteRiderVehicleInfoFromDb,
   updateRiderVehicleInfoInDb,
+  getAllRiderVehicleInfosFromDb,
 };
