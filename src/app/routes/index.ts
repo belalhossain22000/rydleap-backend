@@ -6,6 +6,7 @@ import { SendMessageRoutes } from "../modules/otp/otp.route";
 import { rideRoute } from "../modules/ride/ride.route";
 import { userLocationRoute } from "../modules/userLocation/userLocation.route";
 import { packageRoute } from "../modules/package/package.route";
+import { RiderVehicleInfoRoutes } from "../modules/riderVehicleInfo/riderVehicleInfo.route";
 
 const router = express.Router();
 
@@ -22,10 +23,10 @@ const moduleRoutes = [
     path: "/auth",
     route: AuthRoutes,
   },
-  // {
-  //   path: "/riderVehicleInfo",
-  //   route: RiderVehicleInfoRoutes,
-  // },
+  {
+    path: "/riderVehicleInfo",
+    route: RiderVehicleInfoRoutes,
+  },
   {
     path: "/ride",
     route: rideRoute,

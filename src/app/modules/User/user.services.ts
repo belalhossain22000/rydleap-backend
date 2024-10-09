@@ -65,15 +65,13 @@ const createUserIntoDb = async (payload: any) => {
   return withoutPasswordUser;
 };
 
+// social login
 const socialLogin = async (payload: any) => {
   // Check if the user exists in the database
   let user = await prisma.user.findUnique({
     where: { email: payload.email },
   });
-  const loginData = {
-    email: payload.email,
-    password: payload.password,
-  };
+
   if (user) {
     const accessToken = jwtHelpers.generateToken(
       {

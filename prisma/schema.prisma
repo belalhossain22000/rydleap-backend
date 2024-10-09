@@ -7,6 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// otp model 
 model OTP {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   phoneNumber String   @unique
@@ -14,23 +15,26 @@ model OTP {
   expiry      DateTime
 }
 
+// user model 
 model User {
-  id              String     @id @default(auto()) @map("_id") @db.ObjectId
-  fullName        String
-  profileImage    String?
-  email           String     @unique
-  phoneNumber     String?
-  isPhoenVerified Boolean    @default(false)
-  password        String?
-  role            UserRole
-  status          UserStatus @default(ACTIVE)
-  isDeleted       Boolean    @default(false)
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
+  fullName         String
+  profileImage     String?
+  email            String             @unique
+  phoneNumber      String?
+  isPhoenVerified  Boolean            @default(false)
+  password         String?
+  role             UserRole
+  status           UserStatus         @default(ACTIVE)
+  isDeleted        Boolean            @default(false)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  riderVehicleInfo RiderVehicleInfo[]
 
   @@map("Users")
 }
 
+// user location table
 model UserLocation {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   userId      String   @db.ObjectId
@@ -42,6 +46,7 @@ model UserLocation {
   @@map("usersLocations")
 }
 
+// ride table
 model Ride {
   id             String     @id @default(auto()) @map("_id") @db.ObjectId
   userId         String     @db.ObjectId
@@ -57,6 +62,7 @@ model Ride {
   @@map("Rides")
 }
 
+// package table
 model Package {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId
@@ -70,6 +76,7 @@ model Package {
   @@map("Packages")
 }
 
+// rider vehicle info table
 model RiderVehicleInfo {
   id                        String @id @default(auto()) @map("_id") @db.ObjectId
   vehicleMake               String
@@ -79,8 +86,9 @@ model RiderVehicleInfo {
   vehicleLicensePlateNumber String
   vehicleRegistrationImage  Json
   vehicleInsuranceImage     Json
+  drivingLicenceImage       Json
   userId                    String @db.ObjectId
-  // user                     User   @relation(fields: [userId], references: [id])
+  user                      User   @relation(fields: [userId], references: [id])
 
   @@map("RiderVehicleInfos")
 }
