@@ -12,7 +12,7 @@ import { IVehicleInfoFilterRequest } from "./vehicleInfo.interface";
 // create vehivle information
 const createRiderVehicleInfoIntoDb = async (req: Request, user: any) => {
   const files = req.files as any;
-  console.log(files);
+
 
   if (
     !files.vehicleRegistrationImage &&

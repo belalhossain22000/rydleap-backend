@@ -15,7 +15,6 @@ model OTP {
   expiry      DateTime
 }
 
-// user model 
 model User {
   id               String             @id @default(auto()) @map("_id") @db.ObjectId
   fullName         String
@@ -25,13 +24,48 @@ model User {
   isPhoenVerified  Boolean            @default(false)
   password         String?
   role             UserRole
-  status           UserStatus         @default(ACTIVE)
+  status           UserStatus         @default(INACTIVE)
   isDeleted        Boolean            @default(false)
+  isAvailable      Boolean?           @default(true)
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   riderVehicleInfo RiderVehicleInfo[]
+  locations        UserLocation[]     @relation("UserLocations")
+
+  // Relation to rides as a customer
+  ridesAsCustomer Ride[] @relation("RidesAsCustomer")
+
+  // Relation to rides as a rider
+  ridesAsRider Ride[] @relation("RidesAsRider")
 
   @@map("Users")
+}
+
+model Ride {
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String     @db.ObjectId
+  riderId        String?    @db.ObjectId
+  pickupLat      Float
+  pickupLng      Float
+  destinationLat Float
+  destinationLng Float
+  date           String?
+  time           String?
+  packageId      String     @db.ObjectId
+  status         RideStatus @default(PENDING)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  // Relation to the package
+  package Package @relation(fields: [packageId], references: [id])
+
+  // Relation to the customer (user who requested the ride)
+  user User @relation("RidesAsCustomer", fields: [userId], references: [id])
+
+  // Relation to the rider (user who is assigned as the rider)
+  rider User? @relation("RidesAsRider", fields: [riderId], references: [id])
+
+  @@map("Rides")
 }
 
 // user location table
@@ -42,43 +76,28 @@ model UserLocation {
   locationLng Float
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  user        User     @relation("UserLocations", fields: [userId], references: [id])
 
   @@map("usersLocations")
-}
-
-// ride table
-model Ride {
-  id             String     @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String     @db.ObjectId
-  riderId        String?    @db.ObjectId
-  originLat      Float
-  originLng      Float
-  destinationLat Float
-  destinationLng Float
-  status         RideStatus @default(PENDING)
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-
-  @@map("Rides")
 }
 
 // package table
 model Package {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  name      String
+  name      String   @unique
   price     String
   minutes   String
   image     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  rides     Ride[]
 
   @@map("Packages")
 }
 
 // rider vehicle info table
 model RiderVehicleInfo {
-  id                        String @id @default(auto()) @map("_id") @db.ObjectId
+  id                        String   @id @default(auto()) @map("_id") @db.ObjectId
   vehicleMake               String
   vehicleModel              String
   vehicleYear               String
@@ -87,10 +106,10 @@ model RiderVehicleInfo {
   vehicleRegistrationImage  Json
   vehicleInsuranceImage     Json
   drivingLicenceImage       Json
-  userId                    String @db.ObjectId
-  user                      User   @relation(fields: [userId], references: [id])
-  createdAt                  DateTime @default(now())
-  updatedAt                  DateTime @updatedAt
+  userId                    String   @db.ObjectId
+  user                      User     @relation(fields: [userId], references: [id])
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
 
   @@map("RiderVehicleInfos")
 }
@@ -105,13 +124,22 @@ enum UserStatus {
   ACTIVE
   INACTIVE
   BLOCKED
+  AVAILABLE
+  UNAVAILABLE
+  ON_RIDE
 }
 
 enum RideStatus {
   PENDING
   ACCEPTED
+  DECLINED
   REJECTED
   IN_PROGRESS
   COMPLETED
   CANCELLED
+}
+
+enum PackageName {
+  Economy
+  PREMIUM
 }

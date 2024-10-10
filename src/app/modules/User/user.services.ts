@@ -67,6 +67,7 @@ const createUserIntoDb = async (payload: any) => {
 
 // social login
 const socialLogin = async (payload: any) => {
+  
   // Check if the user exists in the database
   let user = await prisma.user.findUnique({
     where: { email: payload.email },
@@ -149,6 +150,8 @@ const getUsersFromDb = async (
         : { createdAt: "desc" },
     select: {
       id: true,
+      fullName: true,
+      phoneNumber: true,
       email: true,
       role: true,
       status: true,
