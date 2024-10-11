@@ -145,7 +145,38 @@ const getRideRequestsByRiderId = async (riderId: string) => {
   return rides;
 };
 
+const getAllRideRequestsFromDb = async () => {
+  const rides = await prisma.ride.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  if (rides.length === 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, "No Ride Request Found");
+  }
+
+  return rides;
+
+  // // Define the custom order for the status
+  // const statusOrder = [
+  //   "PENDING",
+  //   "IN_PROGRESS",
+  //   "ACCEPTED",
+  //   "COMPLETED",
+  //   "CANCELLED",
+  //   "DECLINED",
+  //   "REJECTED",
+  // ];
+
+  // // Sort the rides based on the custom order of status
+  // rides.sort(
+  //   (a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status)
+  // );
+};
+
 export const RideRequestService = {
   createRideRequest,
   getRideRequestsByRiderId,
+  getAllRideRequestsFromDb,
 };
