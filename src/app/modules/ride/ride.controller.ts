@@ -5,7 +5,7 @@ import httpStatus from "http-status";
 import { RideRequestService } from "./ride.service";
 
 const createRideRequest = catchAsync(async (req: Request, res: Response) => {
-  const result = await RideRequestService.createRideRequest(req.body);
+  const result = await RideRequestService.createRideRequest(req.body, req.user);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -14,6 +14,18 @@ const createRideRequest = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getRiderByRiderId = catchAsync(async (req: Request, res: Response) => {
+  const rider = req.user as any
+  const result = await RideRequestService.getRideRequestsByRiderId(rider.iid);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Pending ride requests retrieved successfully",
+    data: result,
+  });
+});
+
 export const RiderRequestController = {
   createRideRequest,
+  getRiderByRiderId
 };

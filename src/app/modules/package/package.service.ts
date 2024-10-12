@@ -1,17 +1,27 @@
 import { Package } from "@prisma/client";
 import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiErrors";
+import httpStatus from "http-status";
 
 // Create a new package in the database.
 const createPackageIntoDb = async (payload: Package) => {
-  const existingPackage = await prisma.package.findMany();
-  if (existingPackage.some((p) => p.name === payload.name)) {
+  const existingPackage = await prisma.package.findUnique({
+    where: { name: payload.name },
+  });
+  if (existingPackage) {
     throw new ApiError(409, "Package already exists");
   }
 
   const result = await prisma.package.create({
     data: payload,
   });
+  
+  if (!result) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Package Created failed"
+    );
+  }
   return result;
 };
 
@@ -23,6 +33,7 @@ const getAllPackagesIntoDb = async () => {
 
 //get package by id
 const getPackageByIdIntoDb = async (id: string) => {
+  
   const packageById = await prisma.package.findUnique({
     where: { id },
   });
@@ -75,5 +86,5 @@ export const packageService = {
   getAllPackagesIntoDb,
   getPackageByIdIntoDb,
   updatePackageByIdIntoDb,
-  deletePackageByIdIntoDb
+  deletePackageByIdIntoDb,
 };

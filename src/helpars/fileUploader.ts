@@ -7,7 +7,6 @@ const storage = multer.diskStorage({
     cb(null, path.join(process.cwd(), "uploads"));
   },
   filename: async function (req, file, cb) {
-
     cb(null, file.originalname);
   },
 });
@@ -15,16 +14,17 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // upload single image
-const uploadProfileImage = upload.single("carImage");
+const uploadProfileImage = upload.single("profileImage");
 
 // upload multiple image
 const uploadRiderVehicleInfo = upload.fields([
   { name: "vehicleRegistrationImage", maxCount: 1 },
   { name: "vehicleInsuranceImage", maxCount: 1 },
+  { name: "drivingLicenceImage", maxCount: 1 },
 ]);
 
 export const fileUploader = {
   upload,
-  uploadSingle: uploadProfileImage,
+uploadProfileImage,
   uploadRiderVehicleInfo,
 };

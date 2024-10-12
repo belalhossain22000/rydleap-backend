@@ -7,12 +7,12 @@ const router = express.Router();
 
 router.post(
   "/create-package",
-  auth(UserRole.ADMIN),
+
   packageController.createPackage
 );
 router.get("/", packageController.getAllPackages);
 router.get("/:id", packageController.getPackageById);
-router.put("/:id", auth(UserRole.ADMIN), packageController.updatePackage);
+router.put("/:id", auth(UserRole.USER), packageController.updatePackage);
 router.delete("/:id", auth(UserRole.ADMIN), packageController.deletePackage);
 
 export const packageRoute = router;

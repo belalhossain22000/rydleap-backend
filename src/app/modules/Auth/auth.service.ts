@@ -30,9 +30,10 @@ const loginUser = async (payload: { email: string; password: string }) => {
   }
 
   const isCorrectPassword: boolean = await bcrypt.compare(
-    payload.password,
-    userData.password
+    payload.password as string,
+    userData.password as string
   );
+  console.log(isCorrectPassword);
 
   if (!isCorrectPassword) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Password incorrect!");
@@ -48,11 +49,10 @@ const loginUser = async (payload: { email: string; password: string }) => {
   );
 
   const result = {
-   accessToken,
+    accessToken,
   };
   return result;
 };
-
 
 // get user profile
 const getMyProfile = async (user: any) => {
@@ -71,7 +71,7 @@ const getMyProfile = async (user: any) => {
 
   let profileInfo;
 
-   if (userInfo?.role === UserRole.USER) {
+  if (userInfo?.role === UserRole.USER) {
     profileInfo = await prisma.user.findUnique({
       where: {
         email: userInfo?.email,
@@ -95,7 +95,7 @@ const changePassword = async (user: any, payload: any) => {
 
   const isPasswordValid = await bcrypt.compare(
     payload.oldPassword,
-    userData.password
+    userData.password as string
   );
 
   if (!isPasswordValid) {
@@ -131,7 +131,7 @@ const forgotPassword = async (payload: { email: string }) => {
     config.jwt.reset_pass_secret as Secret,
     config.jwt.reset_pass_token_expires_in as string
   );
-  
+
   const resetPassLink =
     config.reset_pass_link + `?userId=${userData.id}&token=${resetPassToken}`;
 
@@ -207,7 +207,7 @@ const resetPasswordFromAppIntoDB = async (payload: {
   phoneNumber: string;
   newPassword: string;
 }) => {
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findFirst({
     where: { phoneNumber: payload.phoneNumber },
   });
 
@@ -223,7 +223,7 @@ const resetPasswordFromAppIntoDB = async (payload: {
 
   await prisma.user.update({
     where: {
-      phoneNumber: payload.phoneNumber,
+      id: user.id,
     },
     data: {
       password: password,

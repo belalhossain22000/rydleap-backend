@@ -15,8 +15,10 @@ const sendOtpMessage = async (payload: any) => {
     throw new ApiError(httpStatus.NOT_FOUND, "Phone number is required");
   }
 
-  // Generate 6-digit OTP
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  // Generate 4-digit OTP
+  const otp = Math.floor(1000 + Math.random() * 9000).toString();
+  console.log(otp);
+
   const expiry = new Date(Date.now() + OTP_EXPIRY_TIME);
 
   // Store OTP in database using Prisma
@@ -85,7 +87,7 @@ const verifyOtpMessage = async (payload: any) => {
       "Invalid OTP. Please check the code and try again."
     );
   }
-  return {phoneNumber};
+  return { phoneNumber };
 };
 
 export const SendOptService = {

@@ -18,6 +18,16 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+// create User
+const socialLogin = catchAsync(async (req: Request, res: Response) => {
+  const result = await userService.socialLogin(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User loggedIn successfully!",
+    data: result,
+  });
+});
 
 // get all user form db
 const getUsers = catchAsync(async (req: Request, res: Response) => {
@@ -66,4 +76,5 @@ export const userController = {
   getUsers,
   updateProfile,
   updateUser,
+  socialLogin
 };
