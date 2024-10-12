@@ -6,6 +6,7 @@ import { SendMessageRoutes } from "../modules/otp/otp.route";
 import { rideRoute } from "../modules/ride/ride.route";
 import { packageRoute } from "../modules/package/package.route";
 import { RiderVehicleInfoRoutes } from "../modules/riderVehicleInfo/riderVehicleInfo.route";
+import { RiderReviewRoute } from "../modules/RiderReview/riderReview.route";
 
 const router = express.Router();
 
@@ -33,6 +34,10 @@ const moduleRoutes = [
   {
     path: "/package",
     route: packageRoute,
+  },
+  {
+    path: "/review",
+    route: RiderReviewRoute,
   },
 ];
 

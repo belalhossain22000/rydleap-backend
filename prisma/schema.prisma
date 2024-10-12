@@ -16,50 +16,65 @@ model OTP {
 }
 
 model User {
-  id               String             @id @default(auto()) @map("_id") @db.ObjectId
-  fullName         String
-  profileImage     String?
-  email            String             @unique
-  phoneNumber      String?
-  isPhoenVerified  Boolean            @default(false)
-  password         String?
-  role             UserRole
-  status           UserStatus         @default(INACTIVE)
-  isDeleted        Boolean            @default(false)
-  isAvailable      Boolean?           @default(true)
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  riderVehicleInfo RiderVehicleInfo[]
-  locations        UserLocation[]     @relation("UserLocations")
-
-  // Relation to rides as a customer
-  ridesAsCustomer Ride[] @relation("RidesAsCustomer")
-
-  // Relation to rides as a rider
-  ridesAsRider Ride[] @relation("RidesAsRider")
+  id                     String             @id @default(auto()) @map("_id") @db.ObjectId
+  fullName               String
+  profileImage           String?
+  email                  String             @unique
+  phoneNumber            String?
+  isPhoenVerified        Boolean            @default(false)
+  password               String?
+  role                   UserRole
+  status                 UserStatus         @default(INACTIVE)
+  isDeleted              Boolean            @default(false)
+  isAvailable            Boolean?           @default(true)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  riderVehicleInfo       RiderVehicleInfo[]
+  locations              UserLocation[]     @relation("UserLocations")
+  ridesAsCustomer        Ride[]             @relation("RidesAsCustomer")
+  ridesAsRider           Ride[]             @relation("RidesAsRider")
+  riderReviewsAsRider    RiderReview[]      @relation("RiderReviewsAsRider")
+  riderReviewsAsCustomer RiderReview[]      @relation("RiderReviewsAsCustomer")
 
   @@map("Users")
 }
 
 model Ride {
-  id             String     @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String     @db.ObjectId
-  riderId        String?    @db.ObjectId
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String        @db.ObjectId
+  riderId        String?       @db.ObjectId
   pickupLat      Float
   pickupLng      Float
   destinationLat Float
   destinationLng Float
   date           String?
   time           String?
-  packageId      String     @db.ObjectId
-  status         RideStatus @default(PENDING)
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  package Package @relation(fields: [packageId], references: [id])
-  user User @relation("RidesAsCustomer", fields: [userId], references: [id])
-  rider User? @relation("RidesAsRider", fields: [riderId], references: [id])
+  packageId      String        @db.ObjectId
+  status         RideStatus    @default(PENDING)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  package        Package       @relation(fields: [packageId], references: [id])
+  user           User          @relation("RidesAsCustomer", fields: [userId], references: [id])
+  rider          User?         @relation("RidesAsRider", fields: [riderId], references: [id])
+  RiderReview    RiderReview[]
 
   @@map("Rides")
+}
+
+model RiderReview {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  rideId     String   @db.ObjectId 
+  riderId    String   @db.ObjectId 
+  customerId String   @db.ObjectId 
+  rating     Int 
+  comment    String? 
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  ride     Ride @relation(fields: [rideId], references: [id])
+  rider    User @relation("RiderReviewsAsRider", fields: [riderId], references: [id])
+  customer User @relation("RiderReviewsAsCustomer", fields: [customerId], references: [id])
+
+  @@map("RiderReviews")
 }
 
 // user location table
