@@ -158,21 +158,6 @@ const getAllRideRequestsFromDb = async () => {
 
   return rides;
 
-  // // Define the custom order for the status
-  // const statusOrder = [
-  //   "PENDING",
-  //   "IN_PROGRESS",
-  //   "ACCEPTED",
-  //   "COMPLETED",
-  //   "CANCELLED",
-  //   "DECLINED",
-  //   "REJECTED",
-  // ];
-
-  // // Sort the rides based on the custom order of status
-  // rides.sort(
-  //   (a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status)
-  // );
 };
 
 export const RideRequestService = {
