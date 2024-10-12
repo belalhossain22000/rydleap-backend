@@ -34,6 +34,30 @@ const getRiderByUserId = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getRideHistoryByUserId = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = req.user as any;
+    const result = await RideRequestService.getRideHistoryByUserId(user.id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "User ride history retrieved successfully",
+      data: result,
+    });
+  }
+);
+const getRideHistoryByRiderId = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = req.user as any;
+    const result = await RideRequestService.getRideHistoryByRiderId(user.id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Rider ride history  retrieved successfully",
+      data: result,
+    });
+  }
+);
 
 const getRideRequests = catchAsync(async (req: Request, res: Response) => {
   const result = await RideRequestService.getAllRideRequestsFromDb();
@@ -47,7 +71,10 @@ const getRideRequests = catchAsync(async (req: Request, res: Response) => {
 const updateRideRequestByRideId = catchAsync(
   async (req: Request, res: Response) => {
     const rideId = req.params.rideId;
-    const result = await RideRequestService.updateRideStatusByRideId(req.body,rideId);
+    const result = await RideRequestService.updateRideStatusByRideId(
+      req.body,
+      rideId
+    );
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -63,4 +90,6 @@ export const RiderRequestController = {
   getRideRequests,
   getRiderByUserId,
   updateRideRequestByRideId,
+  getRideHistoryByRiderId,
+  getRideHistoryByUserId,
 };

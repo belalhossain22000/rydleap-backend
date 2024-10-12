@@ -29,6 +29,16 @@ router.get(
   auth(UserRole.ADMIN),
   RiderRequestController.getRideRequests
 );
+router.get(
+  "/rider-history",
+  auth(UserRole.ADMIN,UserRole.RIDER),
+  RiderRequestController.getRideHistoryByRiderId
+);
+router.get(
+  "/user-history",
+  auth(UserRole.ADMIN,UserRole.USER),
+  RiderRequestController.getRideHistoryByUserId
+);
 router.put(
   "/request/:rideId",
   // auth(UserRole.ADMIN),

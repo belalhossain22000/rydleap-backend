@@ -203,10 +203,65 @@ const updateRideStatusByRideId = async (payload: any, rideId: string) => {
   return updatedRide;
 };
 
+// get ride history from ride table
+
+const getRideHistoryByRiderId = async (riderId: string) => {
+  const rides = await prisma.ride.findMany({
+    where: {
+      riderId: riderId,
+    },
+    include: {
+      user: {
+        include: {
+          riderVehicleInfo: true,
+        },
+      },
+      rider: true,
+      package: true,
+    },
+  });
+
+  if (rides.length === 0) {
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      "No ride history found for this rider"
+    );
+  }
+  return rides;
+};
+
+// get rider history by user id
+const getRideHistoryByUserId = async (userId: string) => {
+
+  const rides = await prisma.ride.findMany({
+    where: {
+      userId: userId,
+    },
+    include: {
+      user: {
+        include: {
+          riderVehicleInfo: true,
+        },
+      },
+      rider: true,
+      package: true,
+    },
+  });
+
+  if (rides.length === 0) {
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      "No ride history found for this rider"
+    );
+  }
+};
+
 export const RideRequestService = {
   createRideRequest,
   getRideRequestsByRiderId,
   getAllRideRequestsFromDb,
   getRideRequestsByUserId,
   updateRideStatusByRideId,
+  getRideHistoryByRiderId,
+  getRideHistoryByUserId,
 };
