@@ -17,4 +17,10 @@ router.get(
   RiderRequestController.getRiderByRiderId
 );
 
+router.get(
+  "/request",
+  auth(UserRole.ADMIN),
+  RiderRequestController.getRideRequests
+);
+
 export const rideRoute = router;

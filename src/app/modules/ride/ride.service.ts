@@ -145,7 +145,23 @@ const getRideRequestsByRiderId = async (riderId: string) => {
   return rides;
 };
 
+const getAllRideRequestsFromDb = async () => {
+  const rides = await prisma.ride.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  if (rides.length === 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, "No Ride Request Found");
+  }
+
+  return rides;
+
+};
+
 export const RideRequestService = {
   createRideRequest,
   getRideRequestsByRiderId,
+  getAllRideRequestsFromDb,
 };
