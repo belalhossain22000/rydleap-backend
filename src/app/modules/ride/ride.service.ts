@@ -145,6 +145,26 @@ const getRideRequestsByRiderId = async (riderId: string) => {
   return rides;
 };
 
+const getRideRequestsByUserId = async (riderId: string) => {
+  // Fetch ride requests for the specified rider with status PENDING
+  const rides = await prisma.ride.findMany({
+    where: {
+      userId: riderId,
+      status: "PENDING",
+    },
+    include: {
+      user: true,
+      rider: true,
+      package: true,
+    },
+  });
+
+  if (!rides || rides.length === 0) {
+    return "No pending ride requests found for this rider";
+  }
+  return rides;
+};
+
 const getAllRideRequestsFromDb = async () => {
   const rides = await prisma.ride.findMany({
     orderBy: {
@@ -157,11 +177,36 @@ const getAllRideRequestsFromDb = async () => {
   }
 
   return rides;
+};
 
+// update ride status
+const updateRideStatusByRideId = async (payload: any, rideId: string) => {
+  const isRideExist = await prisma.ride.findUnique({
+    where: {
+      id: rideId,
+    },
+  });
+  if (!isRideExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Ride not found");
+  }
+  const updatedRide = await prisma.ride.update({
+    where: { id: rideId },
+    data: payload,
+  });
+  if (!updatedRide) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to update ride status"
+    );
+  }
+
+  return updatedRide;
 };
 
 export const RideRequestService = {
   createRideRequest,
   getRideRequestsByRiderId,
   getAllRideRequestsFromDb,
+  getRideRequestsByUserId,
+  updateRideStatusByRideId,
 };

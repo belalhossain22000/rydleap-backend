@@ -55,14 +55,8 @@ model Ride {
   status         RideStatus @default(PENDING)
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
-
-  // Relation to the package
   package Package @relation(fields: [packageId], references: [id])
-
-  // Relation to the customer (user who requested the ride)
   user User @relation("RidesAsCustomer", fields: [userId], references: [id])
-
-  // Relation to the rider (user who is assigned as the rider)
   rider User? @relation("RidesAsRider", fields: [riderId], references: [id])
 
   @@map("Rides")
