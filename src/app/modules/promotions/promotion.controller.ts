@@ -2,7 +2,7 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { promotionsServices } from "./promotion.service";
 
-const createPromotions = catchAsync(async (req, res) => {
+const createPromotion = catchAsync(async (req, res) => {
   const promotions = await promotionsServices.createPromotionsIntoDB(req.body);
 
   sendResponse(res, {
@@ -14,7 +14,7 @@ const createPromotions = catchAsync(async (req, res) => {
 });
 
 const getPromotions = catchAsync(async (req, res) => {
-  const promotions = await promotionsServices.getPromotionsOfferIntoDB();
+  const promotions = await promotionsServices.getPromotionsOfferFromDB();
 
   sendResponse(res, {
     statusCode: 200,
@@ -24,7 +24,36 @@ const getPromotions = catchAsync(async (req, res) => {
   });
 });
 
+const updatePromotion = catchAsync(async (req, res) => {
+  const promotionId: string = req.params.promotionId;
+  const updatedPromotions = await promotionsServices.updatePromotionIntoDB(
+    req.body,
+    promotionId
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Promotions updated successfully",
+    data: updatedPromotions,
+  });
+});
+
+const deletePromotion = catchAsync(async (req, res) => {
+  const promotionId: string = req.params.promotionId;
+  await promotionsServices.deletePromotionIntoDB(promotionId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Promotions deleted successfully",
+    data: null,
+  });
+});
+
 export const promotionsControllers = {
-  createPromotions,
+  createPromotion,
   getPromotions,
+  updatePromotion,
+  deletePromotion,
 };
