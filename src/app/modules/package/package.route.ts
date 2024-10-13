@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.post(
   "/create-package",
+  auth(UserRole.ADMIN),
 
   packageController.createPackage
 );

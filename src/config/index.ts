@@ -21,6 +21,7 @@ export default {
   emailSender: {
     email: process.env.EMAIL,
     app_pass: process.env.APP_PASS,
+    contact_mail_address: process.env.CONTACT_MAIL_ADDRESS,
   },
 
   twilio: {

@@ -7,6 +7,8 @@ import { rideRoute } from "../modules/ride/ride.route";
 import { packageRoute } from "../modules/package/package.route";
 import { RiderVehicleInfoRoutes } from "../modules/riderVehicleInfo/riderVehicleInfo.route";
 import { RiderReviewRoute } from "../modules/RiderReview/riderReview.route";
+import { contactRoutes } from "../modules/contact/contact.route";
+import { promotionsRoute } from "../modules/promotions/promotion.routes";
 
 const router = express.Router();
 
@@ -38,6 +40,14 @@ const moduleRoutes = [
   {
     path: "/review",
     route: RiderReviewRoute,
+  },
+  {
+    path: "/contact",
+    route: contactRoutes,
+  },
+  {
+    path: "/promotions",
+    route: promotionsRoute,
   },
 ];
 

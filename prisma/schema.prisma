@@ -63,16 +63,16 @@ model Ride {
 
 model RiderReview {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  rideId     String   @db.ObjectId 
-  riderId    String   @db.ObjectId 
-  customerId String   @db.ObjectId 
-  rating     Int 
-  comment    String? 
+  rideId     String   @db.ObjectId
+  riderId    String   @db.ObjectId
+  customerId String   @db.ObjectId
+  rating     Int
+  comment    String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  ride     Ride @relation(fields: [rideId], references: [id])
-  rider    User @relation("RiderReviewsAsRider", fields: [riderId], references: [id])
-  customer User @relation("RiderReviewsAsCustomer", fields: [customerId], references: [id])
+  ride       Ride     @relation(fields: [rideId], references: [id])
+  rider      User     @relation("RiderReviewsAsRider", fields: [riderId], references: [id])
+  customer   User     @relation("RiderReviewsAsCustomer", fields: [customerId], references: [id])
 
   @@map("RiderReviews")
 }
@@ -121,6 +121,18 @@ model RiderVehicleInfo {
   updatedAt                 DateTime @updatedAt
 
   @@map("RiderVehicleInfos")
+}
+
+model Offer {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  title    String
+  subTitle String
+  image    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("Offers")
 }
 
 enum UserRole {
