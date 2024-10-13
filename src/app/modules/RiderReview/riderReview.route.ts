@@ -18,4 +18,22 @@ router.get(
   RiderReviewController.getReviewsByRider
 );
 
+router.get(
+  "/:riderId",
+  auth(UserRole.ADMIN, UserRole.USER, UserRole.RIDER),
+  RiderReviewController.getAverageRatingByRiderId
+);
+
+router.put(
+  "/:reviewId",
+  auth(UserRole.ADMIN, UserRole.USER, UserRole.RIDER),
+  RiderReviewController.updateReviewByCustomerId
+);
+
+router.delete(
+  "/:reviewId",
+  auth(UserRole.ADMIN, UserRole.USER, UserRole.RIDER),
+  RiderReviewController.deleteReviewByCustomerId
+);
+
 export const RiderReviewRoute = router;
