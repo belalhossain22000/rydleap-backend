@@ -277,7 +277,7 @@ const getSingleRiderFromDb = async (userId: string) => {
       role: "RIDER",
     },
     include: {
-      ridesAsCustomer: true,
+      ridesAsRider: true,
     },
   });
 
