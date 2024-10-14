@@ -42,8 +42,21 @@ const getUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// get user by id
+// get all riders form db
+const getRiders = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, userFilterableFields);
+  const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
 
+  const result = await userService.getUsersFromDb(filters, options);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Riders retrieve successfully!",
+    data: result,
+  });
+});
+
+// get user by id
 const getUserById = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.userId;
   const result = await userService.getSingleUserFromDb(id);
@@ -56,7 +69,20 @@ const getUserById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// get all user form db
+// get rider by id
+const getRiderById = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.riderId;
+  const result = await userService.getSingleRiderFromDb(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Rider retrieved successfully!",
+    data: result,
+  });
+});
+
+// update user form db
 const updateProfile = catchAsync(
   async (req: Request & { user?: any }, res: Response) => {
     const user = req?.user;
@@ -86,8 +112,10 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 export const userController = {
   createUser,
   getUsers,
+  getRiders,
   updateProfile,
   updateUser,
   socialLogin,
   getUserById,
+  getRiderById,
 };
