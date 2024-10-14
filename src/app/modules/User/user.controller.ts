@@ -47,7 +47,7 @@ const getRiders = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, userFilterableFields);
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
 
-  const result = await userService.getUsersFromDb(filters, options);
+  const result = await userService.getRidersFromDb(filters, options);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
