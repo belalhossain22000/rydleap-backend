@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // upload single image
-const uploadSingleImage = upload.single("singleImage");
+const uploadprofileImage = upload.single("profileImage");
 
 // upload multiple image
 const uploadRiderVehicleInfo = upload.fields([
@@ -25,6 +25,6 @@ const uploadRiderVehicleInfo = upload.fields([
 
 export const fileUploader = {
   upload,
-  uploadSingleImage,
+  uploadprofileImage,
   uploadRiderVehicleInfo,
 };

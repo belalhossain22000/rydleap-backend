@@ -277,7 +277,8 @@ const getSingleRiderFromDb = async (userId: string) => {
       role: "RIDER",
     },
     include: {
-      ridesAsCustomer: true,
+      riderVehicleInfo: true,
+      ridesAsRider: true,
     },
   });
 
@@ -289,8 +290,10 @@ const getSingleRiderFromDb = async (userId: string) => {
 };
 
 // update profile
-const updateProfile = async (user: IUser, payload: IUser) => {
+const updateProfile = async (user: IUser, req: any) => {
+  const files = req.file as any;
 
+  // Find user in the database
   const userInfo = await prisma.user.findUnique({
     where: {
       email: user.email,
@@ -302,14 +305,22 @@ const updateProfile = async (user: IUser, payload: IUser) => {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found");
   }
 
+  const profileData = req.body?.body ? JSON.parse(req.body.body) : {};
+
+  const profileImage = files
+    ? `${config.backend_base_url}/uploads/${files.originalname}`
+    : userInfo.profileImage;
+
   const updatedUser = await prisma.user.update({
     where: {
       id: user.id,
     },
     data: {
-      ...payload,
+      ...profileData,
+      profileImage,
     },
   });
+
   if (!updatedUser) {
     throw new ApiError(httpStatus.BAD_REQUEST, "User update failed");
   }
@@ -317,6 +328,7 @@ const updateProfile = async (user: IUser, payload: IUser) => {
   return updatedUser;
 };
 
+// udpate user profile by id
 const updateUserIntoDb = async (payload: IUser, id: string) => {
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
