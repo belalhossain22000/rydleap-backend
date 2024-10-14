@@ -163,7 +163,10 @@ const getUsersFromDb = async (
   });
 
   const total = await prisma.user.count({
-    where: whereConditions,
+    where: {
+      ...whereConditions,
+      role: "USER",
+    },
   });
   return {
     meta: {
@@ -234,7 +237,10 @@ const getRidersFromDb = async (
   });
 
   const total = await prisma.user.count({
-    where: whereConditions,
+    where: {
+      ...whereConditions,
+      role: "RIDER",
+    },
   });
   return {
     meta: {
