@@ -204,7 +204,6 @@ const updateRideStatusByRideId = async (payload: any, rideId: string) => {
 };
 
 // get ride history from ride table
-
 const getRideHistoryByRiderId = async (riderId: string) => {
   const rides = await prisma.ride.findMany({
     where: {

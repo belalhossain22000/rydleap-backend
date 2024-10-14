@@ -138,7 +138,10 @@ const getUsersFromDb = async (
     andConditions.length > 0 ? { AND: andConditions } : {};
 
   const result = await prisma.user.findMany({
-    where: whereConditions,
+    where: {
+      ...whereConditions,
+      role: "USER",
+    },
     skip: skip,
     take: limit,
     orderBy:
@@ -160,7 +163,10 @@ const getUsersFromDb = async (
   });
 
   const total = await prisma.user.count({
-    where: whereConditions,
+    where: {
+      ...whereConditions,
+      role: "USER",
+    },
   });
   return {
     meta: {
@@ -170,6 +176,116 @@ const getUsersFromDb = async (
     },
     data: result,
   };
+};
+
+// reterive all riders from the database
+const getRidersFromDb = async (
+  params: IUserFilterRequest,
+  options: IPaginationOptions
+) => {
+  const { page, limit, skip } = paginationHelper.calculatePagination(options);
+  const { searchTerm, ...filterData } = params;
+
+  const andConditions: Prisma.UserWhereInput[] = [];
+
+  if (params.searchTerm) {
+    andConditions.push({
+      OR: userSearchAbleFields.map((field) => ({
+        [field]: {
+          contains: params.searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: (filterData as any)[key],
+        },
+      })),
+    });
+  }
+  const whereConditions: Prisma.UserWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.user.findMany({
+    where: {
+      ...whereConditions,
+      role: "RIDER",
+    },
+    skip: skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? {
+            [options.sortBy]: [options.sortOrder],
+          }
+        : { createdAt: "desc" },
+    select: {
+      id: true,
+      fullName: true,
+      phoneNumber: true,
+      email: true,
+      role: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  const total = await prisma.user.count({
+    where: {
+      ...whereConditions,
+      role: "RIDER",
+    },
+  });
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
+const getSingleUserFromDb = async (userId: string) => {
+  const userInfo = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: userId,
+      role: "USER",
+    },
+    include: {
+      ridesAsCustomer: true,
+    },
+  });
+
+  if (!userInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  return userInfo;
+};
+
+const getSingleRiderFromDb = async (userId: string) => {
+  const riderInfo = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: userId,
+      role: "RIDER",
+    },
+    include: {
+      ridesAsCustomer: true,
+    },
+  });
+
+  if (!riderInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Rider not found");
+  }
+
+  return riderInfo;
 };
 
 // update profile
@@ -228,7 +344,10 @@ const updateUserIntoDb = async (payload: IUser, id: string) => {
 export const userService = {
   createUserIntoDb,
   getUsersFromDb,
+  getRidersFromDb,
   updateProfile,
   updateUserIntoDb,
   socialLogin,
+  getSingleUserFromDb,
+  getSingleRiderFromDb,
 };
