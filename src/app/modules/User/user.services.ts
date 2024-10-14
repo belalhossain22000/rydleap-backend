@@ -67,7 +67,6 @@ const createUserIntoDb = async (payload: any) => {
 
 // social login
 const socialLogin = async (payload: any) => {
-  
   // Check if the user exists in the database
   let user = await prisma.user.findUnique({
     where: { email: payload.email },
@@ -139,7 +138,10 @@ const getUsersFromDb = async (
     andConditions.length > 0 ? { AND: andConditions } : {};
 
   const result = await prisma.user.findMany({
-    where: whereConditions,
+    where: {
+      ...whereConditions,
+      role: "USER",
+    },
     skip: skip,
     take: limit,
     orderBy:
@@ -171,6 +173,23 @@ const getUsersFromDb = async (
     },
     data: result,
   };
+};
+
+const getSingleUserFromDb = async (userId: string) => {
+  if (userId === null) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User ID is required!");
+  }
+  const userInfo = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (!userInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  return userInfo;
 };
 
 // update profile
@@ -212,4 +231,5 @@ export const userService = {
   updateProfile,
   updateUserIntoDb,
   socialLogin,
+  getSingleUserFromDb,
 };

@@ -5,8 +5,7 @@ import { userService } from "./user.services";
 import { Request, Response } from "express";
 import pick from "../../../shared/pick";
 import { userFilterableFields } from "./user.costant";
-
-
+import ApiError from "../../errors/ApiErrors";
 
 // create User
 const createUser = catchAsync(async (req: Request, res: Response) => {
@@ -43,6 +42,20 @@ const getUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get user by id
+
+const getUserById = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.userId;
+  const result = await userService.getSingleUserFromDb(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User retrieved successfully!",
+    data: result,
+  });
+});
+
 // get all user form db
 const updateProfile = catchAsync(
   async (req: Request & { user?: any }, res: Response) => {
@@ -71,10 +84,10 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const userController = {
-
-   createUser,
+  createUser,
   getUsers,
   updateProfile,
   updateUser,
-  socialLogin
+  socialLogin,
+  getUserById,
 };
