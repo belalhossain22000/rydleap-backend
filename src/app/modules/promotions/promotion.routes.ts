@@ -11,7 +11,11 @@ router.post(
   promotionsControllers.createPromotion
 );
 
-router.get("/", promotionsControllers.getPromotions);
+router.get(
+  "/",
+  auth(UserRole.ADMIN, UserRole.RIDER, UserRole.USER),
+  promotionsControllers.getPromotions
+);
 
 router.put(
   "/:promotionId",

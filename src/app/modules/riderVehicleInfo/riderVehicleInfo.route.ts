@@ -11,7 +11,6 @@ router.post(
   "/",
   auth(UserRole.ADMIN, UserRole.USER, UserRole.RIDER),
   fileUploader.uploadRiderVehicleInfo,
-  // validateRequest(RiderVehicleValidationSchema.createRiderVehicleInfoSchema),
   RiderVehicleInfoController.createRiderVehicleInfo
 );
 router.get(

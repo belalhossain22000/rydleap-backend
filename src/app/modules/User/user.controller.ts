@@ -6,8 +6,6 @@ import { Request, Response } from "express";
 import pick from "../../../shared/pick";
 import { userFilterableFields } from "./user.costant";
 
-
-
 // create User
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const result = await userService.createUserIntoDb(req.body);
@@ -47,7 +45,7 @@ const getUsers = catchAsync(async (req: Request, res: Response) => {
 const updateProfile = catchAsync(
   async (req: Request & { user?: any }, res: Response) => {
     const user = req?.user;
-
+  
     const result = await userService.updateProfile(user, req.body);
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -71,10 +69,9 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const userController = {
-
-   createUser,
+  createUser,
   getUsers,
   updateProfile,
   updateUser,
-  socialLogin
+  socialLogin,
 };

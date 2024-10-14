@@ -67,7 +67,6 @@ const createUserIntoDb = async (payload: any) => {
 
 // social login
 const socialLogin = async (payload: any) => {
-  
   // Check if the user exists in the database
   let user = await prisma.user.findUnique({
     where: { email: payload.email },
@@ -175,34 +174,54 @@ const getUsersFromDb = async (
 
 // update profile
 const updateProfile = async (user: IUser, payload: IUser) => {
+
   const userInfo = await prisma.user.findUnique({
     where: {
       email: user.email,
       id: user.id,
     },
   });
+
+  if (!userInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      ...payload,
+    },
+  });
+  if (!updatedUser) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User update failed");
+  }
+
+  return updatedUser;
 };
 
 const updateUserIntoDb = async (payload: IUser, id: string) => {
-  // Retrieve the existing user info
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
       id: id,
     },
   });
+  if (!userInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
 
-  // Update the user with the provided payload
   const result = await prisma.user.update({
     where: {
       id: userInfo.id,
     },
     data: {
-      status: payload.status || userInfo.status,
-      role: payload.role || userInfo.role,
-      updatedAt: new Date(),
+      ...payload,
     },
   });
-
+  if (!result) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User update failed");
+  }
   return result;
 };
 
