@@ -5,6 +5,7 @@ import ApiError from "../../errors/ApiErrors";
 //create profile
 const createRydleapProfileIntoDB = async (req: any) => {
   const files = req.file as any;
+  const adminId = req.user.id;
   const payload = req.body?.body ? JSON.parse(req.body.body) : {};
   const isExistingProfile = await prisma.rydleapProfile.findFirst({
     where: {
@@ -26,6 +27,7 @@ const createRydleapProfileIntoDB = async (req: any) => {
     data: {
       ...profileData,
       logo,
+      adminId,
     },
   });
   return result;

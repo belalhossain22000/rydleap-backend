@@ -36,6 +36,7 @@ model User {
   ridesAsRider           Ride[]             @relation("RidesAsRider")
   riderReviewsAsRider    RiderReview[]      @relation("RiderReviewsAsRider")
   riderReviewsAsCustomer RiderReview[]      @relation("RiderReviewsAsCustomer")
+  rydleapProfile         RydleapProfile[]
 
   @@map("Users")
 }
@@ -137,6 +138,8 @@ model Offer {
 
 model RydleapProfile {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  adminId         String  @db.ObjectId
+  admin           User     @relation(fields: [adminId], references: [id])
   supportEmail    String
   phoneNumber     String
   address         String
