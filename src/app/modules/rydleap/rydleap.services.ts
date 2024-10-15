@@ -35,7 +35,11 @@ const createRydleapProfileIntoDB = async (req: any) => {
 
 //get profile
 const getProfileFromDB = async () => {
-  const result = await prisma.rydleapProfile.findMany();
+  const result = await prisma.rydleapProfile.findMany({
+    include: {
+      admin: true,
+    },
+  });
   if (result.length === 0) {
     throw new ApiError(404, "Profile not found!");
   }
