@@ -101,8 +101,8 @@ async function shutdownServer() {
 
 const restartServer = async () => {
   console.info("Restarting server...");
-  await shutdownServer(); // Close the current server first
-  await main(); // Restart the main function to initialize the server again
+  await shutdownServer(); 
+  await main(); 
 };
 
 async function main() {
