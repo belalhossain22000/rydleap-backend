@@ -185,8 +185,6 @@ const getUsersFromDB = async () => {
     },
     select: {
       id: true,
-      fullName: true,
-      email: true,
       role: true,
       status: true,
       createdAt: true,
@@ -278,8 +276,6 @@ const getRidersFromDB = async () => {
     },
     select: {
       id: true,
-      fullName: true,
-      email: true,
       role: true,
       status: true,
       createdAt: true,
