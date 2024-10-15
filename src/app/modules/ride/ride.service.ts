@@ -212,12 +212,9 @@ const getRideHistoryByRiderId = async (riderId: string) => {
     include: {
       user: {
         include: {
-          riderVehicleInfo: true,
-          riderReviewsAsRider:true,
+          riderReviewsAsRider: true,
         },
       },
-      rider: true,
-      package: true,
     },
   });
 
@@ -239,12 +236,9 @@ const getRideHistoryByUserId = async (userId: string) => {
     include: {
       user: {
         include: {
-          riderVehicleInfo: true,
-          ridesAsCustomer:true,
+          riderReviewsAsCustomer: true,
         },
       },
-      rider: true,
-      package: true,
     },
   });
 
