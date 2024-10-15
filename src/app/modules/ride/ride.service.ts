@@ -213,6 +213,7 @@ const getRideHistoryByRiderId = async (riderId: string) => {
       user: {
         include: {
           riderVehicleInfo: true,
+          riderReviewsAsRider:true,
         },
       },
       rider: true,
@@ -231,7 +232,6 @@ const getRideHistoryByRiderId = async (riderId: string) => {
 
 // get rider history by user id
 const getRideHistoryByUserId = async (userId: string) => {
-
   const rides = await prisma.ride.findMany({
     where: {
       userId: userId,
@@ -240,6 +240,7 @@ const getRideHistoryByUserId = async (userId: string) => {
       user: {
         include: {
           riderVehicleInfo: true,
+          ridesAsCustomer:true,
         },
       },
       rider: true,
@@ -253,6 +254,7 @@ const getRideHistoryByUserId = async (userId: string) => {
       "No ride history found for this rider"
     );
   }
+  return rides;
 };
 
 export const RideRequestService = {
