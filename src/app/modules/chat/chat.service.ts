@@ -1,7 +1,6 @@
 import httpStatus from "http-status";
 import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiErrors";
-
 const createConversation = async (payload: any) => {
   const { userIds } = payload;
 
@@ -30,6 +29,35 @@ const createConversation = async (payload: any) => {
     );
   }
 
+  // Check if conversation with the same participants already exists
+  const existingConversation = await prisma.conversation.findMany({
+    where: {
+      participants: {
+        every: {
+          userId: { in: userIds },
+        },
+      },
+    },
+    include: {
+      participants: true, // Include participants to compare them
+    },
+  });
+
+  // Find conversation with exact same participants (same length and same set of users)
+  const conversationMatch = existingConversation.find((conv) => {
+    const participantIds = conv.participants.map((p) => p.userId);
+    return (
+      participantIds.length === userIds.length &&
+      userIds.every((id) => participantIds.includes(id))
+    );
+  });
+
+  if (conversationMatch) {
+    // If a conversation with the same users exists, return it
+    return conversationMatch;
+  }
+
+  // If no conversation exists, create a new one
   const conversation = await prisma.conversation.create({
     data: {
       participants: {
@@ -83,7 +111,6 @@ const getMessagesInConversation = async (conversationId: string) => {
 };
 
 const getAllConversations = async (userId: string) => {
-
   if (!userId) {
     throw new Error("User ID is required to retrieve conversations.");
   }
@@ -97,11 +124,7 @@ const getAllConversations = async (userId: string) => {
       },
     },
     include: {
-      messages: {
-        orderBy: {
-          createdAt: "desc",
-        },
-      },
+      messages: true,
       participants: true,
     },
   });
