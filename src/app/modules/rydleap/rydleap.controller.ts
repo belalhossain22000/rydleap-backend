@@ -42,8 +42,22 @@ const updateRydleapProfile = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// delete rydleap profile
+const deleteRydleapProfile = catchAsync(async (req: Request, res: Response) => {
+  const profileId = req.params.id;
+  await rydleapService.deleteProfileFromDB(profileId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Rydleap Profile deleted successfully",
+    data: null,
+  });
+});
+
 export const rydleapController = {
   createRydleapProfile,
   getRydleapProfiles,
   updateRydleapProfile,
+  deleteRydleapProfile,
 };

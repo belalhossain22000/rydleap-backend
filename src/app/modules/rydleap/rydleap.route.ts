@@ -26,4 +26,10 @@ router.patch(
   rydleapController.updateRydleapProfile
 );
 
+router.delete(
+  "/delete-profile/:id",
+  auth(UserRole.ADMIN),
+  rydleapController.deleteRydleapProfile
+);
+
 export const rydleapRoutes = router;

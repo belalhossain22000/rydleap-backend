@@ -80,8 +80,24 @@ const updateRydleapProfileIntoDB = async (profileId: string, req: any) => {
   return profileToUpdate;
 };
 
+//delete profile
+const deleteProfileFromDB = async (profileId: string) => {
+  const profile = await prisma.rydleapProfile.findUnique({
+    where: { id: profileId },
+  });
+  if (!profile) {
+    throw new ApiError(404, "profile not found");
+  }
+
+  await prisma.rydleapProfile.delete({
+    where: { id: profileId },
+  });
+  return;
+};
+
 export const rydleapService = {
   createRydleapProfileIntoDB,
   getProfileFromDB,
   updateRydleapProfileIntoDB,
+  deleteProfileFromDB,
 };
