@@ -227,7 +227,7 @@ const getRideHistoryByRiderId = async (riderId: string) => {
   return rides;
 };
 
-// get rider history by user id
+// get user history by user id
 const getRideHistoryByUserId = async (userId: string) => {
   const rides = await prisma.ride.findMany({
     where: {
@@ -245,7 +245,7 @@ const getRideHistoryByUserId = async (userId: string) => {
   if (rides.length === 0) {
     throw new ApiError(
       httpStatus.NOT_FOUND,
-      "No ride history found for this rider"
+      "No user history found for this rider"
     );
   }
   return rides;
