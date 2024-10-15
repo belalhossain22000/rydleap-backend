@@ -178,6 +178,25 @@ const getUsersFromDb = async (
   };
 };
 
+const getUsersFromDB = async () => {
+  const result = await prisma.user.findMany({
+    where: {
+      role: "USER",
+    },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      role: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  return result;
+};
+
 // reterive all riders from the database
 const getRidersFromDb = async (
   params: IUserFilterRequest,
@@ -250,6 +269,25 @@ const getRidersFromDb = async (
     },
     data: result,
   };
+};
+
+const getRidersFromDB = async () => {
+  const result = await prisma.user.findMany({
+    where: {
+      role: "RIDER",
+    },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      role: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  return result;
 };
 
 const getSingleUserFromDb = async (userId: string) => {
@@ -352,7 +390,9 @@ const updateUserIntoDb = async (payload: IUser, id: string) => {
 export const userService = {
   createUserIntoDb,
   getUsersFromDb,
+  getUsersFromDB,
   getRidersFromDb,
+  getRidersFromDB,
   updateProfile,
   updateUserIntoDb,
   socialLogin,

@@ -42,6 +42,26 @@ const getUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const result = await userService.getUsersFromDB();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All Users retrieved successfully",
+    data: result,
+  });
+});
+
+const getAllRiders = catchAsync(async (req: Request, res: Response) => {
+  const result = await userService.getUsersFromDB();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All Riders retrieved successfully",
+    data: result,
+  });
+});
+
 // get all riders form db
 const getRiders = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, userFilterableFields);
@@ -86,7 +106,7 @@ const getRiderById = catchAsync(async (req: Request, res: Response) => {
 const updateProfile = catchAsync(
   async (req: Request & { user?: any }, res: Response) => {
     const user = req?.user;
-  
+
     const result = await userService.updateProfile(user, req);
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -112,7 +132,9 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 export const userController = {
   createUser,
   getUsers,
+  getAllUsers,
   getRiders,
+  getAllRiders,
   updateProfile,
   updateUser,
   socialLogin,

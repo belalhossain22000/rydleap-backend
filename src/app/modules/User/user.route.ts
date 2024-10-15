@@ -15,8 +15,14 @@ router.post("/social", userController.socialLogin);
 // *!get all  user
 router.get("/", userController.getUsers);
 
+//for dashboard
+router.get("/all-users", userController.getAllUsers);
+
 //get all riders
 router.get("/riders", userController.getRiders);
+
+//for dashboard
+router.get("/all-riders", userController.getAllRiders);
 
 //get single user
 router.get("/:userId", userController.getUserById);
