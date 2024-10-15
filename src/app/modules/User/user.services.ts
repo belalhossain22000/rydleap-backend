@@ -258,9 +258,6 @@ const getSingleUserFromDb = async (userId: string) => {
       id: userId,
       role: "USER",
     },
-    include: {
-      ridesAsCustomer: true,
-    },
   });
 
   if (!userInfo) {
@@ -277,7 +274,7 @@ const getSingleRiderFromDb = async (userId: string) => {
       role: "RIDER",
     },
     include: {
-      ridesAsRider: true,
+      riderVehicleInfo: true,
     },
   });
 
