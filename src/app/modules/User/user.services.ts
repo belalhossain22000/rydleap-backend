@@ -286,35 +286,66 @@ const getSingleRiderFromDb = async (userId: string) => {
 };
 
 // update profile
-const updateProfile = async (user: IUser, payload: IUser) => {
+const updateProfile = async (user: IUser, req: any) => {
+  const files = req.file as any;
+
+  // Find user in the database
   const userInfo = await prisma.user.findUnique({
     where: {
       email: user.email,
       id: user.id,
     },
   });
+
+  if (!userInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  const profileData = req.body?.body ? JSON.parse(req.body.body) : {};
+
+  const profileImage = files
+    ? `${config.backend_base_url}/uploads/${files.originalname}`
+    : userInfo.profileImage;
+
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      ...profileData,
+      profileImage,
+    },
+  });
+
+  if (!updatedUser) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User update failed");
+  }
+
+  return updatedUser;
 };
 
+// udpate user profile by id
 const updateUserIntoDb = async (payload: IUser, id: string) => {
-  // Retrieve the existing user info
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
       id: id,
     },
   });
+  if (!userInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
 
-  // Update the user with the provided payload
   const result = await prisma.user.update({
     where: {
       id: userInfo.id,
     },
     data: {
-      status: payload.status || userInfo.status,
-      role: payload.role || userInfo.role,
-      updatedAt: new Date(),
+      ...payload,
     },
   });
-
+  if (!result) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User update failed");
+  }
   return result;
 };
 

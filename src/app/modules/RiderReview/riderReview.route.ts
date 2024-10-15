@@ -14,7 +14,6 @@ router.post(
 router.get(
   "/",
   auth(UserRole.ADMIN, UserRole.USER, UserRole.RIDER),
-  //   validateRequest(RiderReviewValidationSchema),
   RiderReviewController.getReviewsByRider
 );
 

@@ -86,8 +86,8 @@ const getRiderById = catchAsync(async (req: Request, res: Response) => {
 const updateProfile = catchAsync(
   async (req: Request & { user?: any }, res: Response) => {
     const user = req?.user;
-
-    const result = await userService.updateProfile(user, req.body);
+  
+    const result = await userService.updateProfile(user, req);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,

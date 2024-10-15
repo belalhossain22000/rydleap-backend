@@ -13,7 +13,6 @@ import { IVehicleInfoFilterRequest } from "./vehicleInfo.interface";
 const createRiderVehicleInfoIntoDb = async (req: Request, user: any) => {
   const files = req.files as any;
 
-
   if (
     !files.vehicleRegistrationImage &&
     !files.vehicleInsuranceImage &&
@@ -55,6 +54,7 @@ const createRiderVehicleInfoIntoDb = async (req: Request, user: any) => {
     ...vehicleInfo,
     ...vehicleInfoImages,
   };
+
   const result = await prisma.riderVehicleInfo.create({
     data: { ...vehicleInfoData, userId: user.id },
   });
