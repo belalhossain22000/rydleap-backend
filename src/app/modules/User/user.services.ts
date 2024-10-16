@@ -290,10 +290,13 @@ const getSingleUserFromDb = async (userId: string) => {
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
       id: userId,
-      role: "USER",
     },
     include: {
-      ridesAsCustomer: true,
+      ridesAsCustomer: {
+        where: {
+          status: "COMPLETED",
+        },
+      },
       riderReviewsAsCustomer: true,
     },
   });
@@ -314,7 +317,11 @@ const getSingleRiderFromDb = async (userId: string) => {
     include: {
       riderVehicleInfo: true,
       riderReviewsAsRider: true,
-      ridesAsRider: true,
+      ridesAsRider: {
+        where: {
+          status: "COMPLETED",
+        },
+      },
     },
   });
 
