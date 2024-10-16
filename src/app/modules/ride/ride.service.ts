@@ -33,18 +33,6 @@ const createRideRequest = async (payload: any, user: any) => {
     );
   }
 
-  // Create the new ride request
-  const ride = await prisma.ride.create({
-    data: { ...payload, userId: user.id },
-  });
-
-  if (!ride) {
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      "Failed to create ride request"
-    );
-  }
-
   // Find the nearest available rider
   const { pickupLat, pickupLng } = payload;
 
@@ -110,6 +98,11 @@ const createRideRequest = async (payload: any, user: any) => {
   }
 
   if (nearestRider) {
+    // Create the new ride request
+    const ride = await prisma.ride.create({
+      data: { ...payload, userId: user.id },
+    });
+
     // Update the ride request with the assigned rider
     const updatedRide = await prisma.ride.update({
       where: { id: ride.id },

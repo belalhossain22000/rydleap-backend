@@ -10,6 +10,7 @@ import { RiderReviewRoute } from "../modules/RiderReview/riderReview.route";
 import { contactRoutes } from "../modules/contact/contact.route";
 import { promotionsRoute } from "../modules/promotions/promotion.routes";
 import { rydleapRoutes } from "../modules/rydleap/rydleap.route";
+import { userLocationRoute } from "../modules/userLocation/userLocation.route";
 
 const router = express.Router();
 
@@ -53,6 +54,10 @@ const moduleRoutes = [
   {
     path: "/rydleap",
     route: rydleapRoutes,
+  },
+  {
+    path: "/user-location",
+    route: userLocationRoute,
   },
 ];
 
