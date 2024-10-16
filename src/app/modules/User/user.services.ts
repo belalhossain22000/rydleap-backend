@@ -292,6 +292,10 @@ const getSingleUserFromDb = async (userId: string) => {
       id: userId,
       role: "USER",
     },
+    include: {
+      ridesAsCustomer: true,
+      riderReviewsAsCustomer: true,
+    },
   });
 
   if (!userInfo) {
@@ -309,6 +313,8 @@ const getSingleRiderFromDb = async (userId: string) => {
     },
     include: {
       riderVehicleInfo: true,
+      riderReviewsAsRider: true,
+      ridesAsRider: true,
     },
   });
 
