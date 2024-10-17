@@ -233,6 +233,29 @@ const resetPasswordFromAppIntoDB = async (payload: {
   return user;
 };
 
+//update fcp token
+const updateFcpTokenIntoDB = async (req: any) => {
+  const { userId, fcp } = req.params;
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const updateFcpToken = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      fcpmToken: fcp,
+    },
+  });
+
+  return updateFcpToken;
+};
+
 export const AuthServices = {
   loginUser,
   getMyProfile,
@@ -240,4 +263,5 @@ export const AuthServices = {
   forgotPassword,
   resetPassword,
   resetPasswordFromAppIntoDB,
+  updateFcpTokenIntoDB,
 };

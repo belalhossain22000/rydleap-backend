@@ -99,6 +99,17 @@ const resetPasswordFromApp = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateFcpToken = catchAsync(async (req: Request, res: Response) => {
+  const updateToken = await AuthServices.updateFcpTokenIntoDB(req);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "FCP Token Updated Successfully",
+    data: updateToken,
+  });
+});
+
 export const AuthController = {
   loginUser,
   logoutUser,
@@ -107,4 +118,5 @@ export const AuthController = {
   forgotPassword,
   resetPassword,
   resetPasswordFromApp,
+  updateFcpToken,
 };

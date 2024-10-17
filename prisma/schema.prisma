@@ -23,6 +23,7 @@ model User {
   phoneNumber            String?
   isPhoenVerified        Boolean            @default(false)
   password               String?
+  fcpmToken              String?
   role                   UserRole           @default(USER)
   status                 UserStatus         @default(INACTIVE)
   isOnline               Boolean?           @default(false)
@@ -138,7 +139,7 @@ model Offer {
 
 model RydleapProfile {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  adminId         String  @db.ObjectId
+  adminId         String   @db.ObjectId
   admin           User     @relation(fields: [adminId], references: [id])
   supportEmail    String
   phoneNumber     String
