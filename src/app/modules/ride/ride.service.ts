@@ -78,6 +78,17 @@ const createRideRequest = async (payload: any, user: any) => {
   let nearestRider = null;
   let nearestDistance = Infinity;
 
+  // for (const rider of riders) {
+  //   console.log("Rider:", rider);
+
+  //   if (rider.locations.length > 0) {
+  //     const riderLocation = rider.locations[0];
+  //     console.log(`Rider ${rider.id} location:`, riderLocation);
+  //   } else {
+  //     console.log(`Rider ${rider.id} has no location.`);
+  //   }
+  // }
+
   for (const rider of riders) {
     // Check if the rider has a location entry
     if (rider.locations.length > 0) {
