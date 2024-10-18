@@ -65,6 +65,36 @@ const createUserIntoDb = async (payload: any) => {
   return withoutPasswordUser;
 };
 
+//create a new user for firebase registration
+const createUserFirebase = async (payload: any) => {
+  const existingUser = await prisma.user.findUnique({
+    where: { email: payload.email },
+  });
+
+  if (existingUser) {
+    throw new ApiError(
+      httpStatus.CONFLICT,
+      `User already exists with this  ${payload.email}`
+    );
+  }
+
+  await prisma.user.create({
+    data: payload,
+  });
+
+  const accessToken = jwtHelpers.generateToken(
+    {
+      email: payload.email,
+      role: payload.role,
+    },
+    config.jwt.jwt_secret as Secret,
+    config.jwt.expires_in as string
+  );
+
+  const result = { accessToken };
+  return result;
+};
+
 // social login
 const socialLogin = async (payload: any) => {
   // Check if the user exists in the database
@@ -407,4 +437,5 @@ export const userService = {
   socialLogin,
   getSingleUserFromDb,
   getSingleRiderFromDb,
+  createUserFirebase,
 };

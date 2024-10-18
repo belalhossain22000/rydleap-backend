@@ -10,6 +10,10 @@ const router = express.Router();
 
 // create user
 router.post("/register", userController.createUser);
+
+//create user for firebase registration
+router.post("/register-firebase", userController.createFirebaseUser);
+
 // create user
 router.post("/social", userController.socialLogin);
 // *!get all  user

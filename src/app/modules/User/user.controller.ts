@@ -17,6 +17,24 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+//create a user for firebase registration
+const createFirebaseUser = catchAsync(async (req: Request, res: Response) => {
+  const user = await userService.createUserFirebase(req.body);
+
+  res.cookie("accessToken", user.accessToken, {
+    secure: false,
+    httpOnly: true,
+  });
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: "user registered successfully",
+    data: user,
+  });
+});
+
 // create User
 const socialLogin = catchAsync(async (req: Request, res: Response) => {
   const result = await userService.socialLogin(req.body);
@@ -140,4 +158,5 @@ export const userController = {
   socialLogin,
   getUserById,
   getRiderById,
+  createFirebaseUser,
 };
