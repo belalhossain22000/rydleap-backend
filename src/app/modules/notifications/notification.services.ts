@@ -17,7 +17,7 @@ const sendSingleNotification = async (req: any) => {
   const message = {
     notification: {
       title: req.body.title,
-      body: req.body.message,
+      body: req.body.body,
     },
     token: req.params.fcmToken,
   };
@@ -28,7 +28,6 @@ const sendSingleNotification = async (req: any) => {
 
 // Send notifications to all users with valid FCM tokens
 const sendNotifications = async (req: any) => {
-  // Get all users who have a valid FCM token
   const users = await prisma.user.findMany({
     where: {
       fcpmToken: {
@@ -44,21 +43,18 @@ const sendNotifications = async (req: any) => {
     throw new ApiError(404, "No users found with FCM tokens");
   }
 
-  // Extract FCM tokens
   const fcmTokens = users.map((user) => user.fcpmToken);
 
-  // Prepare notification payload
   const message = {
     notification: {
       title: req.body.title,
-      body: req.body.message,
+      body: req.body.body,
     },
     tokens: fcmTokens,
   };
 
   const response = await admin.messaging().sendEachForMulticast(message as any);
 
-  // Log error details for failed tokens
   response.responses.forEach((res, idx) => {
     if (!res.success) {
       console.error(`Error sending to token ${fcmTokens[idx]}:`, res.error);
