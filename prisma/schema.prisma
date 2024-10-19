@@ -16,27 +16,27 @@ model OTP {
 }
 
 model User {
-  id                     String             @id @default(auto()) @map("_id") @db.ObjectId
+  id                     String            @id @default(auto()) @map("_id") @db.ObjectId
   fullName               String
   profileImage           String?
-  email                  String             @unique
+  email                  String            @unique
   phoneNumber            String?
-  isPhoenVerified        Boolean            @default(false)
+  isPhoenVerified        Boolean           @default(false)
   password               String?
   fcpmToken              String?
-  role                   UserRole           @default(USER)
-  status                 UserStatus         @default(INACTIVE)
-  isOnline               Boolean?           @default(false)
-  isDeleted              Boolean            @default(false)
-  isAvailable            Boolean?           @default(true)
-  createdAt              DateTime           @default(now())
-  updatedAt              DateTime           @updatedAt
-  riderVehicleInfo       RiderVehicleInfo[]
-  locations              UserLocation[]     @relation("UserLocations")
-  ridesAsCustomer        Ride[]             @relation("RidesAsCustomer")
-  ridesAsRider           Ride[]             @relation("RidesAsRider")
-  riderReviewsAsRider    RiderReview[]      @relation("RiderReviewsAsRider")
-  riderReviewsAsCustomer RiderReview[]      @relation("RiderReviewsAsCustomer")
+  role                   UserRole          @default(USER)
+  status                 UserStatus        @default(INACTIVE)
+  isOnline               Boolean?          @default(false)
+  isDeleted              Boolean           @default(false)
+  isAvailable            Boolean?          @default(true)
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+  riderVehicleInfo       RiderVehicleInfo?
+  locations              UserLocation?     @relation("UserLocation") // Now it's a single object (one-to-one)
+  ridesAsCustomer        Ride?             @relation("RidesAsCustomer")
+  ridesAsRider           Ride?             @relation("RidesAsRider")
+  riderReviewsAsRider    RiderReview?      @relation("RiderReviewsAsRider")
+  riderReviewsAsCustomer RiderReview?      @relation("RiderReviewsAsCustomer")
   rydleapProfile         RydleapProfile[]
 
   @@map("Users")
@@ -44,8 +44,8 @@ model User {
 
 model Ride {
   id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String        @db.ObjectId
-  riderId        String?       @db.ObjectId
+  userId         String        @unique @db.ObjectId
+  riderId        String        @unique @db.ObjectId
   pickupLat      Float
   pickupLng      Float
   destinationLat Float
@@ -67,8 +67,8 @@ model Ride {
 model RiderReview {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   rideId     String   @db.ObjectId
-  riderId    String   @db.ObjectId
-  customerId String   @db.ObjectId
+  riderId    String   @unique @db.ObjectId
+  customerId String   @unique @db.ObjectId
   rating     Int
   comment    String?
   createdAt  DateTime @default(now())
@@ -83,12 +83,12 @@ model RiderReview {
 // user location table
 model UserLocation {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId
+  userId      String   @unique @db.ObjectId
   locationLat Float
   locationLng Float
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  user        User     @relation("UserLocations", fields: [userId], references: [id])
+  user        User     @relation("UserLocation", fields: [userId], references: [id])
 
   @@map("usersLocations")
 }
@@ -118,7 +118,7 @@ model RiderVehicleInfo {
   vehicleRegistrationImage  Json
   vehicleInsuranceImage     Json
   drivingLicenceImage       Json
-  userId                    String   @db.ObjectId
+  userId                    String   @unique @db.ObjectId
   user                      User     @relation(fields: [userId], references: [id])
   createdAt                 DateTime @default(now())
   updatedAt                 DateTime @updatedAt
