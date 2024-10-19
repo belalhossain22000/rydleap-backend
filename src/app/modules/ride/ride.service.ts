@@ -91,8 +91,8 @@ const createRideRequest = async (payload: any, user: any) => {
 
   for (const rider of riders) {
     // Check if the rider has a location entry
-    if (rider.locations.length > 0) {
-      const riderLocation = rider.locations[0];
+    if (rider.locations) {
+      const riderLocation = rider.locations;
       const distance = haversineDistance(
         pickupLat,
         pickupLng,
