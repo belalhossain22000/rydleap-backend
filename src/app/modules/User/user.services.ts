@@ -189,8 +189,8 @@ const getUsersFromDb = async (
       status: true,
       createdAt: true,
       updatedAt: true,
+      locations: true,
       riderReviewsAsCustomer: true,
-      ridesAsCustomer: true,
     },
   });
 
@@ -282,9 +282,9 @@ const getRidersFromDb = async (
       status: true,
       createdAt: true,
       updatedAt: true,
+      locations: true,
       riderVehicleInfo: true,
       riderReviewsAsRider: true,
-      ridesAsRider: true,
     },
   });
 
