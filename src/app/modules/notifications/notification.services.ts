@@ -19,9 +19,18 @@ const sendSingleNotification = async (req: any) => {
     },
     token: user.fcpmToken,
   };
-  const response = await admin.messaging().send(message);
-
-  return response;
+  try {
+    const response = await admin.messaging().send(message);
+    return response;
+  } catch (error: any) {
+    if (error.code === "messaging/invalid-registration-token") {
+      throw new ApiError(400, "Invalid FCM registration token");
+    } else if (error.code === "messaging/registration-token-not-registered") {
+      throw new ApiError(404, "FCM token is no longer registered");
+    } else {
+      throw new ApiError(500, "Failed to send notification");
+    }
+  }
 };
 
 // Send notifications to all users with valid FCM tokens
