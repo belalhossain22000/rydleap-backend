@@ -4,14 +4,12 @@ import ApiError from "../../errors/ApiErrors";
 
 // Send notification to a single user
 const sendSingleNotification = async (req: any) => {
-  const isExist = await prisma.user.findFirst({
-    where: {
-      fcpmToken: req.params.fcmToken,
-    },
+  const user = await prisma.user.findUnique({
+    where: { id: req.params.userId },
   });
 
-  if (!isExist) {
-    throw new ApiError(404, "Logged in user not found");
+  if (!user?.fcpmToken) {
+    throw new ApiError(404, "User not found with FCM token");
   }
 
   const message = {
@@ -19,7 +17,7 @@ const sendSingleNotification = async (req: any) => {
       title: req.body.title,
       body: req.body.body,
     },
-    token: req.params.fcmToken,
+    token: user.fcpmToken,
   };
   const response = await admin.messaging().send(message);
 

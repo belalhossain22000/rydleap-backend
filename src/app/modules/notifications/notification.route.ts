@@ -5,7 +5,7 @@ import auth from "../../middlewares/auth";
 const router = express.Router();
 
 router.post(
-  "/send-notification/:fcmToken",
+  "/send-notification/:userId",
   auth(),
   notificationController.sendNotification
 );
