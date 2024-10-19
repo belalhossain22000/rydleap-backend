@@ -23,7 +23,7 @@ router.get("/", userController.getUsers);
 router.get("/all-users", userController.getAllUsers);
 
 //get all riders
-router.get("/riders", userController.getRiders);
+router.get("/riders", auth(), userController.getRiders);
 
 //for dashboard
 router.get("/all-riders", userController.getAllRiders);
@@ -32,11 +32,7 @@ router.get("/all-riders", userController.getAllRiders);
 router.get("/:userId", userController.getUserById);
 
 //get single rider
-router.get(
-  "/single-rider/:riderId",
-  auth(),
-  userController.getRiderById
-);
+router.get("/single-rider/:riderId", auth(), userController.getRiderById);
 
 // *!profile user
 router.put(
