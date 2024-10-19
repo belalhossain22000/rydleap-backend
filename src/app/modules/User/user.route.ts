@@ -32,7 +32,11 @@ router.get("/all-riders", userController.getAllRiders);
 router.get("/:userId", userController.getUserById);
 
 //get single rider
-router.get("/single-rider/:riderId", userController.getRiderById);
+router.get(
+  "/single-rider/:riderId",
+  auth(),
+  userController.getRiderById
+);
 
 // *!profile user
 router.put(
