@@ -44,20 +44,20 @@ model User {
 
 model Ride {
   id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String        @unique @db.ObjectId
-  riderId        String        @unique @db.ObjectId
+  userId         String?       @unique @db.ObjectId
+  riderId        String?       @unique @db.ObjectId
   pickupLat      Float
   pickupLng      Float
   destinationLat Float
   destinationLng Float
   date           String?
   time           String?
-  packageId      String        @db.ObjectId
+  packageId      String        @unique @db.ObjectId
   status         RideStatus    @default(PENDING)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
-  package        Package       @relation(fields: [packageId], references: [id])
-  user           User          @relation("RidesAsCustomer", fields: [userId], references: [id])
+  package        Package?      @relation(fields: [packageId], references: [id])
+  user           User?         @relation("RidesAsCustomer", fields: [userId], references: [id])
   rider          User?         @relation("RidesAsRider", fields: [riderId], references: [id])
   RiderReview    RiderReview[]
 
