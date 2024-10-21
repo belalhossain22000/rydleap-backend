@@ -246,6 +246,7 @@ const updateFcpTokenIntoDB = async (req: any, res: any) => {
   if (!user) {
     const userData = { ...bodyData, fcpmToken: fcp, email: mail };
     const result = await userService.createUserFirebase(userData);
+
     res.cookie("accessToken", result.accessToken, {
       secure: false,
       httpOnly: true,
@@ -254,7 +255,7 @@ const updateFcpTokenIntoDB = async (req: any, res: any) => {
     return result;
   }
 
-  const updateFcpToken = await prisma.user.update({
+  await prisma.user.update({
     where: { email: mail },
     data: {
       fcpmToken: fcp,
