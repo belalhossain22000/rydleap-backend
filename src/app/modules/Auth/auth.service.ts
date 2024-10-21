@@ -7,6 +7,7 @@ import ApiError from "../../errors/ApiErrors";
 import emailSender from "./emailSender";
 import { UserRole, UserStatus } from "@prisma/client";
 import httpStatus from "http-status";
+import { userService } from "../User/user.services";
 
 // user login
 const loginUser = async (payload: { email: string; password: string }) => {
@@ -234,26 +235,49 @@ const resetPasswordFromAppIntoDB = async (payload: {
 };
 
 //update fcp token
-const updateFcpTokenIntoDB = async (req: any) => {
-  const { userId, fcp } = req.params;
+const updateFcpTokenIntoDB = async (req: any, res: any) => {
+  const { mail, fcp } = req.params;
   const user = await prisma.user.findUnique({
-    where: { id: userId },
+    where: { email: mail },
   });
 
+  const bodyData = req.body;
+
   if (!user) {
-    throw new ApiError(404, "User not found");
+    const userData = { ...bodyData, fcpmToken: fcp, email: mail };
+    const result = await userService.createUserFirebase(userData);
+    res.cookie("accessToken", result.accessToken, {
+      secure: false,
+      httpOnly: true,
+    });
+
+    return result;
   }
 
   const updateFcpToken = await prisma.user.update({
-    where: {
-      id: userId,
-    },
+    where: { email: mail },
     data: {
       fcpmToken: fcp,
     },
   });
 
-  return updateFcpToken;
+  const accessToken = jwtHelpers.generateToken(
+    {
+      email: bodyData.email,
+      role: bodyData.role,
+    },
+    config.jwt.jwt_secret as Secret,
+    config.jwt.expires_in as string
+  );
+
+  const result = { accessToken };
+
+  res.cookie("accessToken", result.accessToken, {
+    secure: false,
+    httpOnly: true,
+  });
+
+  return result;
 };
 
 export const AuthServices = {

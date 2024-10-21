@@ -54,6 +54,6 @@ router.get(
   }
 );
 
-router.patch("/update-fcp/:userId/:fcp", AuthController.updateFcpToken);
+router.patch("/update-fcp/:mail/:fcp", AuthController.updateFcpToken);
 
 export const AuthRoutes = router;

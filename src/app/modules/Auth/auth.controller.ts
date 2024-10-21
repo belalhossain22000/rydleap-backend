@@ -3,7 +3,6 @@ import catchAsync from "../../../shared/catchAsync";
 import { AuthServices } from "./auth.service";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
-import { string } from "zod";
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthServices.loginUser(req.body);
@@ -11,6 +10,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   res.cookie("accessToken", result.accessToken, {
     secure: false,
     httpOnly: true,
+    sameSite: "none",
   });
 
   sendResponse(res, {
@@ -100,7 +100,7 @@ const resetPasswordFromApp = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateFcpToken = catchAsync(async (req: Request, res: Response) => {
-  const updateToken = await AuthServices.updateFcpTokenIntoDB(req);
+  const updateToken = await AuthServices.updateFcpTokenIntoDB(req, res);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
