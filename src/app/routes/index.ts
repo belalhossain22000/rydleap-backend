@@ -12,6 +12,7 @@ import { promotionsRoute } from "../modules/promotions/promotion.routes";
 import { rydleapRoutes } from "../modules/rydleap/rydleap.route";
 import { userLocationRoute } from "../modules/userLocation/userLocation.route";
 import { notificationsRoute } from "../modules/notifications/notification.route";
+import { paymentRoutes } from "../modules/payment/paypal.routes";
 
 const router = express.Router();
 
@@ -64,6 +65,11 @@ const moduleRoutes = [
   {
     path: "/notifications",
     route: notificationsRoute,
+  },
+
+  {
+    path: "/payment",
+    route: paymentRoutes,
   },
 ];
 
