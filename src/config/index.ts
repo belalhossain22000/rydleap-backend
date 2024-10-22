@@ -37,4 +37,9 @@ export default {
     // githubClientId:process.env.GITHUB_CLIENT_ID,
     // githubClientSecret:process.env.GITHUB_CLIENT_SECRET,
   },
+
+  paypal: {
+    paypalClientId: process.env.PAYPAL_CLIENT_ID,
+    paypalSecretId: process.env.PAYPAL_SECRET_ID,
+  },
 };

@@ -1,13 +1,11 @@
 import https from "https";
 import { getPayPalAccessToken } from "../../../helpars/getPaypalAccessToken";
+import config from "../../../config";
 
 //payment from owner to rider
 const sendPaymentToRider = async (riderPaypalEmail: string, amount: number) => {
-  console.log(riderPaypalEmail, amount);
-  const clientId =
-    "ASd_lmSnTy8kndq2i7Ti5pOa78WOeio7wOc8UeGi7lIahMr6-8diXFiqvymTJylctAOKlFIrdPaQlfmB";
-  const secret =
-    "EE9AbR3F8K7Hm0IvpzzF5EEiF3Nn2Ze0V8r9uopPvB-l85MEiCzRt1g924hBZiIxOU7wNrLEVAnzmXV5";
+  const clientId = config.paypal.paypalClientId;
+  const secret = config.paypal.paypalSecretId;
   const auth = Buffer.from(`${clientId}:${secret}`).toString("base64");
 
   const url = new URL("https://api.sandbox.paypal.com/v1/payments/payouts");
