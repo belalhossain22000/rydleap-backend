@@ -1,6 +1,7 @@
 import https from "https";
 import { getPayPalAccessToken } from "../../../helpars/getPaypalAccessToken";
 
+//payment from owner to rider
 const sendPaymentToRider = async (riderPaypalEmail: string, amount: number) => {
   console.log(riderPaypalEmail, amount);
   const clientId =
@@ -78,6 +79,7 @@ const sendPaymentToRider = async (riderPaypalEmail: string, amount: number) => {
   });
 };
 
+//payment order created by user
 const sendPaymentToOwner = async (req: any) => {
   const { amount } = req.body;
 
@@ -143,7 +145,7 @@ const sendPaymentToOwner = async (req: any) => {
   }
 };
 
-// Function to capture the payment
+//capture payment from user by order id
 const capturePayment = async (orderId: string) => {
   try {
     const accessToken = await getPayPalAccessToken();

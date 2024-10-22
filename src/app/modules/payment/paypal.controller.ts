@@ -2,6 +2,7 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { paymentService } from "./paypal.service";
 
+//payment from owner to rider
 const paypalPaymentToRider = catchAsync(async (req: any, res: any) => {
   const { email, amount } = req.body;
   const result = await paymentService.sendPaymentToRider(email, amount);
@@ -14,6 +15,7 @@ const paypalPaymentToRider = catchAsync(async (req: any, res: any) => {
   });
 });
 
+//payment order created by user
 const paypalPaymentToOwner = catchAsync(async (req: any, res: any) => {
   const result: any = await paymentService.sendPaymentToOwner(req);
 
@@ -56,6 +58,7 @@ const paypalPaymentToOwner = catchAsync(async (req: any, res: any) => {
   }
 });
 
+//capture payment from user by order id
 const capturePayment = catchAsync(async (req: any, res: any) => {
   const { orderId } = req.query; // Get orderId from the query parameters
 
