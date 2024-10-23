@@ -14,6 +14,7 @@ import { rydleapRoutes } from "../modules/rydleap/rydleap.route";
 import { StripeRoutes } from "../modules/Stripe/stripe.routes";
 import { userLocationRoute } from "../modules/userLocation/userLocation.route";
 import { paymentRoutes } from "../modules/Paypal/paypal.routes";
+import { transactionRoutes } from "../modules/Transactions/transaction.routes";
 
 const router = express.Router();
 
@@ -75,6 +76,10 @@ const moduleRoutes = [
   {
     path: "/stripe",
     route: StripeRoutes,
+  },
+  {
+    path: "/transactions",
+    route: transactionRoutes,
   },
 ];
 
