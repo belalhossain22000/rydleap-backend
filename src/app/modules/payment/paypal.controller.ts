@@ -1,4 +1,5 @@
 import catchAsync from "../../../shared/catchAsync";
+import prisma from "../../../shared/prisma";
 import sendResponse from "../../../shared/sendResponse";
 import { paymentService } from "./paypal.service";
 
@@ -19,8 +20,6 @@ const paypalPaymentToRider = catchAsync(async (req: any, res: any) => {
 const paypalPaymentToOwner = catchAsync(async (req: any, res: any) => {
   const result: any = await paymentService.sendPaymentToOwner(req);
 
-  console.log(result);
-
   if (result && result.status === "CREATED") {
     // Find the approval link from the response
     const approvalLink = result.links.find(
@@ -28,15 +27,23 @@ const paypalPaymentToOwner = catchAsync(async (req: any, res: any) => {
     );
 
     if (approvalLink) {
+      const transactionInfo = await prisma.userTransaction.create({
+        data: {
+          userId: req.user.id,
+          riderId: req.body.riderId,
+          rideId: req.params.rideId,
+          amount: req.body.amount,
+          paymentMethod: req.body.paymentMethod,
+          orderId: result.id,
+          url: approvalLink.href,
+        },
+      });
       // Respond with the approval URL
       sendResponse(res, {
         statusCode: 200,
         success: true,
         message: "Payment created. Redirect the user to approve the payment.",
-        data: {
-          orderId: result.id,
-          url: approvalLink.href,
-        }, // Include the approval link in the response
+        data: transactionInfo,
       });
     } else {
       // Handle case where the approval link is not found
@@ -73,8 +80,28 @@ const capturePayment = catchAsync(async (req: any, res: any) => {
 
   try {
     const captureResult: any = await paymentService.capturePayment(orderId); // Capture the payment
+    console.log(captureResult);
 
     if (captureResult.status === "COMPLETED") {
+      await prisma.userTransaction.updateMany({
+        where: { orderId: captureResult.id },
+        data: {
+          status: captureResult.status,
+        },
+      });
+
+      // await prisma.riderTransaction.create({
+      //   data: {
+      //     userId: captureResult.payer.payer_id,
+      //     riderId:
+      //       captureResult.transactions[0].related_resources[0].sale.payer
+      //         .payer_id,
+      //     rideId: captureResult.transactions[0].related_resources[0].sale.id,
+      //     amount: captureResult.transactions[0].amount.total,
+      //     paymentMethod: captureResult.payment_method,
+      //     orderId: captureResult.id,
+      //   },
+      // });
       // Payment was successful
       sendResponse(res, {
         statusCode: 200,

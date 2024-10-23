@@ -10,7 +10,8 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   res.cookie("accessToken", result.accessToken, {
     secure: false,
     httpOnly: true,
-    sameSite: "none",
+    sameSite: "lax",
+    maxAge: 24 * 60 * 60 * 1000,
   });
 
   sendResponse(res, {

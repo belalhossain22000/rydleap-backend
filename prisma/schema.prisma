@@ -16,50 +16,86 @@ model OTP {
 }
 
 model User {
-  id                     String            @id @default(auto()) @map("_id") @db.ObjectId
+  id                     String             @id @default(auto()) @map("_id") @db.ObjectId
   fullName               String
   profileImage           String?
-  email                  String            @unique
+  email                  String             @unique
   phoneNumber            String?
-  isPhoenVerified        Boolean           @default(false)
+  isPhoenVerified        Boolean            @default(false)
   password               String?
   fcpmToken              String?
-  role                   UserRole          @default(USER)
-  status                 UserStatus        @default(INACTIVE)
-  isOnline               Boolean?          @default(false)
-  isDeleted              Boolean           @default(false)
-  isAvailable            Boolean?          @default(true)
-  createdAt              DateTime          @default(now())
-  updatedAt              DateTime          @updatedAt
+  role                   UserRole           @default(USER)
+  status                 UserStatus         @default(INACTIVE)
+  isOnline               Boolean?           @default(false)
+  isDeleted              Boolean            @default(false)
+  isAvailable            Boolean?           @default(true)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
   riderVehicleInfo       RiderVehicleInfo?
-  locations              UserLocation?     @relation("UserLocation") // Now it's a single object (one-to-one)
-  ridesAsCustomer        Ride?             @relation("RidesAsCustomer")
-  ridesAsRider           Ride?             @relation("RidesAsRider")
-  riderReviewsAsRider    RiderReview?      @relation("RiderReviewsAsRider")
-  riderReviewsAsCustomer RiderReview?      @relation("RiderReviewsAsCustomer")
+  locations              UserLocation?      @relation("UserLocation") // Now it's a single object (one-to-one)
+  ridesAsCustomer        Ride?              @relation("RidesAsCustomer")
+  ridesAsRider           Ride?              @relation("RidesAsRider")
+  riderReviewsAsRider    RiderReview?       @relation("RiderReviewsAsRider")
+  riderReviewsAsCustomer RiderReview?       @relation("RiderReviewsAsCustomer")
   rydleapProfile         RydleapProfile[]
+  userTransactions       UserTransaction[]
+  riderTransactions      RiderTransaction[]
 
   @@map("Users")
 }
 
+model UserTransaction {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  amount          Int
+  userId          String        @db.ObjectId
+  rideId          String        @db.ObjectId
+  riderId         String        @db.ObjectId
+  orderId         String
+  url             String
+  status          PaymentStatus @default(PENDING)
+  paymentMethod   String
+  transactionType String        @default("Ride Fare")
+  user            User          @relation(fields: [userId], references: [id])
+  ride            Ride          @relation(fields: [rideId], references: [id])
+
+  @@map("UserTransactions")
+}
+
+model RiderTransaction {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  amount        Int
+  riderId       String        @db.ObjectId
+  rideId        String        @db.ObjectId
+  userId        String        @db.ObjectId
+  orderId       String        @db.ObjectId
+  status        PaymentStatus @default(PENDING)
+  paymentMethod String
+  rider         User          @relation(fields: [riderId], references: [id])
+  ride          Ride          @relation(fields: [rideId], references: [id])
+
+  @@map("RiderTransactions")
+}
+
 model Ride {
-  id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String?       @unique @db.ObjectId
-  riderId        String?       @unique @db.ObjectId
-  pickupLat      Float
-  pickupLng      Float
-  destinationLat Float
-  destinationLng Float
-  date           String?
-  time           String?
-  packageId      String        @unique @db.ObjectId
-  status         RideStatus    @default(PENDING)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  package        Package?      @relation(fields: [packageId], references: [id])
-  user           User?         @relation("RidesAsCustomer", fields: [userId], references: [id])
-  rider          User?         @relation("RidesAsRider", fields: [riderId], references: [id])
-  RiderReview    RiderReview[]
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String?            @unique @db.ObjectId
+  riderId          String?            @unique @db.ObjectId
+  pickupLat        Float
+  pickupLng        Float
+  destinationLat   Float
+  destinationLng   Float
+  date             String?
+  time             String?
+  packageId        String             @unique @db.ObjectId
+  status           RideStatus         @default(PENDING)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  package          Package?           @relation(fields: [packageId], references: [id])
+  user             User?              @relation("RidesAsCustomer", fields: [userId], references: [id])
+  rider            User?              @relation("RidesAsRider", fields: [riderId], references: [id])
+  RiderReview      RiderReview[]
+  userTransaction  UserTransaction[]
+  riderTransaction RiderTransaction[]
 
   @@map("Rides")
 }
@@ -182,4 +218,9 @@ enum RideStatus {
 enum PackageName {
   Economy
   PREMIUM
+}
+
+enum PaymentStatus {
+  COMPLETED
+  PENDING
 }

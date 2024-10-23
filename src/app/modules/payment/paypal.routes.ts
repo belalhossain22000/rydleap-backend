@@ -12,7 +12,11 @@ router.post(
 );
 
 //payment order created by user
-router.post("/paypal-payment-owner", paypalController.paypalPaymentToOwner);
+router.post(
+  "/paypal-payment-owner/:rideId",
+  auth(),
+  paypalController.paypalPaymentToOwner
+);
 
 //capture payment from user by order id
 router.post("/paypal-capture-payment", paypalController.capturePayment);
