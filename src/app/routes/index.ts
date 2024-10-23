@@ -6,7 +6,6 @@ import { userRoutes } from "../modules/User/user.route";
 import { contactRoutes } from "../modules/contact/contact.route";
 import { notificationsRoute } from "../modules/notifications/notification.route";
 import { packageRoute } from "../modules/package/package.route";
-import { paymentRoutes } from "../modules/payment/paypal.routes";
 import { promotionsRoute } from "../modules/promotions/promotion.routes";
 import { rideRoute } from "../modules/ride/ride.route";
 import { RiderReviewRoute } from "../modules/RiderReview/riderReview.route";
@@ -14,6 +13,7 @@ import { RiderVehicleInfoRoutes } from "../modules/riderVehicleInfo/riderVehicle
 import { rydleapRoutes } from "../modules/rydleap/rydleap.route";
 import { StripeRoutes } from "../modules/Stripe/stripe.routes";
 import { userLocationRoute } from "../modules/userLocation/userLocation.route";
+import { paymentRoutes } from "../modules/Paypal/paypal.routes";
 
 const router = express.Router();
 

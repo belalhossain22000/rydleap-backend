@@ -1,6 +1,7 @@
 import catchAsync from "../../../shared/catchAsync";
 import prisma from "../../../shared/prisma";
 import sendResponse from "../../../shared/sendResponse";
+import ApiError from "../../errors/ApiErrors";
 import { paymentService } from "./paypal.service";
 
 //payment from owner to rider
@@ -33,7 +34,7 @@ const paypalPaymentToOwner = catchAsync(async (req: any, res: any) => {
           riderId: req.body.riderId,
           rideId: req.params.rideId,
           amount: req.body.amount,
-          paymentMethod: req.body.paymentMethod,
+          paymentMethod: "Paypal",
           orderId: result.id,
           url: approvalLink.href,
         },
@@ -67,15 +68,10 @@ const paypalPaymentToOwner = catchAsync(async (req: any, res: any) => {
 
 //capture payment from user by order id
 const capturePayment = catchAsync(async (req: any, res: any) => {
-  const { orderId } = req.query; // Get orderId from the query parameters
+  const { orderId, riderId, rideId } = req.body; // Get orderId from the query parameters
 
   if (!orderId) {
-    return sendResponse(res, {
-      statusCode: 400,
-      success: false,
-      message: "Order ID is required.",
-      data: null,
-    });
+    throw new ApiError(404, "Order not found");
   }
 
   try {
@@ -90,18 +86,22 @@ const capturePayment = catchAsync(async (req: any, res: any) => {
         },
       });
 
-      // await prisma.riderTransaction.create({
-      //   data: {
-      //     userId: captureResult.payer.payer_id,
-      //     riderId:
-      //       captureResult.transactions[0].related_resources[0].sale.payer
-      //         .payer_id,
-      //     rideId: captureResult.transactions[0].related_resources[0].sale.id,
-      //     amount: captureResult.transactions[0].amount.total,
-      //     paymentMethod: captureResult.payment_method,
-      //     orderId: captureResult.id,
-      //   },
-      // });
+      //update rider isAvailable
+      await prisma.user.update({
+        where: { id: riderId },
+        data: {
+          isAvailable: true,
+        },
+      });
+
+      //update ride status to completed
+      await prisma.ride.update({
+        where: { id: rideId },
+        data: {
+          status: "COMPLETED",
+        },
+      });
+
       // Payment was successful
       sendResponse(res, {
         statusCode: 200,

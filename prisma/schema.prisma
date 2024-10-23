@@ -51,7 +51,7 @@ model UserTransaction {
   rideId          String        @db.ObjectId
   riderId         String        @db.ObjectId
   orderId         String
-  url             String
+  url             String?
   status          PaymentStatus @default(PENDING)
   paymentMethod   String
   transactionType String        @default("Ride Fare")
