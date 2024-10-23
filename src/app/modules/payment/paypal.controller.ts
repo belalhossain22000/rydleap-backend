@@ -33,7 +33,7 @@ const paypalPaymentToOwner = catchAsync(async (req: any, res: any) => {
           riderId: req.body.riderId,
           rideId: req.params.rideId,
           amount: req.body.amount,
-          paymentMethod: req.body.paymentMethod,
+          paymentMethod: "Paypal",
           orderId: result.id,
           url: approvalLink.href,
         },
@@ -89,19 +89,6 @@ const capturePayment = catchAsync(async (req: any, res: any) => {
           status: captureResult.status,
         },
       });
-
-      // await prisma.riderTransaction.create({
-      //   data: {
-      //     userId: captureResult.payer.payer_id,
-      //     riderId:
-      //       captureResult.transactions[0].related_resources[0].sale.payer
-      //         .payer_id,
-      //     rideId: captureResult.transactions[0].related_resources[0].sale.id,
-      //     amount: captureResult.transactions[0].amount.total,
-      //     paymentMethod: captureResult.payment_method,
-      //     orderId: captureResult.id,
-      //   },
-      // });
       // Payment was successful
       sendResponse(res, {
         statusCode: 200,
