@@ -12,10 +12,7 @@ const stripe = new Stripe(
 );
 
 // Service function for creating a PaymentIntent
-const createPaymentIntentService = async (payload: {
-  amount: number;
-  paymentType: string;
-}) => {
+const createPaymentIntentService = async (payload: { amount: number }) => {
   if (!payload.amount) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Amount is required");
   }
