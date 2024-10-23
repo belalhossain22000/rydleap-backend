@@ -12,7 +12,8 @@ import { promotionsRoute } from "../modules/promotions/promotion.routes";
 import { rydleapRoutes } from "../modules/rydleap/rydleap.route";
 import { userLocationRoute } from "../modules/userLocation/userLocation.route";
 import { notificationsRoute } from "../modules/notifications/notification.route";
-import { paymentRoutes } from "../modules/payment/paypal.routes";
+import { paymentRoutes } from "../modules/payment/payment.routes";
+import { transactionRoutes } from "../modules/Transactions/transaction.routes";
 
 const router = express.Router();
 
@@ -70,6 +71,10 @@ const moduleRoutes = [
   {
     path: "/payment",
     route: paymentRoutes,
+  },
+  {
+    path: "/transactions",
+    route: transactionRoutes,
   },
 ];
 
