@@ -1,18 +1,19 @@
 import express from "express";
-import { userRoutes } from "../modules/User/user.route";
 import { AuthRoutes } from "../modules/Auth/auth.routes";
 import { SendMessageRoutes } from "../modules/otp/otp.route";
+import { userRoutes } from "../modules/User/user.route";
 // import { RiderVehicleInfoRoutes } from "../modules/riderVehicleInfo/riderVehicleInfo.route";
-import { rideRoute } from "../modules/ride/ride.route";
-import { packageRoute } from "../modules/package/package.route";
-import { RiderVehicleInfoRoutes } from "../modules/riderVehicleInfo/riderVehicleInfo.route";
-import { RiderReviewRoute } from "../modules/RiderReview/riderReview.route";
 import { contactRoutes } from "../modules/contact/contact.route";
-import { promotionsRoute } from "../modules/promotions/promotion.routes";
-import { rydleapRoutes } from "../modules/rydleap/rydleap.route";
-import { userLocationRoute } from "../modules/userLocation/userLocation.route";
 import { notificationsRoute } from "../modules/notifications/notification.route";
+import { packageRoute } from "../modules/package/package.route";
 import { paymentRoutes } from "../modules/payment/paypal.routes";
+import { promotionsRoute } from "../modules/promotions/promotion.routes";
+import { rideRoute } from "../modules/ride/ride.route";
+import { RiderReviewRoute } from "../modules/RiderReview/riderReview.route";
+import { RiderVehicleInfoRoutes } from "../modules/riderVehicleInfo/riderVehicleInfo.route";
+import { rydleapRoutes } from "../modules/rydleap/rydleap.route";
+import { StripeRoutes } from "../modules/Stripe/stripe.routes";
+import { userLocationRoute } from "../modules/userLocation/userLocation.route";
 
 const router = express.Router();
 
@@ -70,6 +71,10 @@ const moduleRoutes = [
   {
     path: "/payment",
     route: paymentRoutes,
+  },
+  {
+    path: "/stripe",
+    route: StripeRoutes,
   },
 ];
 
