@@ -169,6 +169,30 @@ const getRideRequestsByUserId = async (riderId: string) => {
   return rides;
 };
 
+//view ride request info when see the ride request
+const getRideRequestByRideId = async (rideId: string) => {
+  const ride = await prisma.ride.findUnique({
+    where: {
+      id: rideId,
+    },
+    include: {
+      user: {
+        select: {
+          fullName: true,
+          email: true,
+          phoneNumber: true,
+        },
+      },
+    },
+  });
+
+  if (!ride) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Ride not found");
+  }
+
+  return ride;
+};
+
 const getAllRideRequestsFromDb = async () => {
   const rides = await prisma.ride.findMany({
     orderBy: {
@@ -266,4 +290,5 @@ export const RideRequestService = {
   updateRideStatusByRideId,
   getRideHistoryByRiderId,
   getRideHistoryByUserId,
+  getRideRequestByRideId,
 };

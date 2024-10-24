@@ -72,6 +72,18 @@ const getRideRequests = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//view ride request info when see the ride request
+const getRideRequest = catchAsync(async (req: Request, res: Response) => {
+  const rideId = req.params.rideId;
+  const result = await RideRequestService.getRideRequestByRideId(rideId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Ride request info retrieved successfully",
+    data: result,
+  });
+});
+
 const updateRideRequestByRideId = catchAsync(
   async (req: Request, res: Response) => {
     const rideId = req.params.rideId;
@@ -96,4 +108,5 @@ export const RiderRequestController = {
   updateRideRequestByRideId,
   getRideHistoryByRiderId,
   getRideHistoryByUserId,
+  getRideRequest,
 };

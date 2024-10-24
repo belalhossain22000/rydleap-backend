@@ -32,7 +32,7 @@ model User {
   createdAt              DateTime           @default(now())
   updatedAt              DateTime           @updatedAt
   riderVehicleInfo       RiderVehicleInfo?
-  locations              UserLocation?      @relation("UserLocation") // Now it's a single object (one-to-one)
+  locations              UserLocation?      @relation("UserLocation")
   ridesAsCustomer        Ride?              @relation("RidesAsCustomer")
   ridesAsRider           Ride?              @relation("RidesAsRider")
   riderReviewsAsRider    RiderReview?       @relation("RiderReviewsAsRider")

@@ -46,4 +46,10 @@ router.put(
   RiderRequestController.updateRideRequestByRideId
 );
 
+router.get(
+  "/request/:rideId",
+  auth(UserRole.RIDER),
+  RiderRequestController.getRideRequest
+);
+
 export const rideRoute = router;
