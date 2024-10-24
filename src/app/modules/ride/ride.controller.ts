@@ -24,6 +24,7 @@ const getRiderByRiderId = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const getRiderByUserId = catchAsync(async (req: Request, res: Response) => {
   const user = req.user as any;
   const result = await RideRequestService.getRideRequestsByUserId(user.id);
@@ -34,6 +35,7 @@ const getRiderByUserId = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const getRideHistoryByUserId = catchAsync(
   async (req: Request, res: Response) => {
     const user = req.user as any;
@@ -46,6 +48,7 @@ const getRideHistoryByUserId = catchAsync(
     });
   }
 );
+
 const getRideHistoryByRiderId = catchAsync(
   async (req: Request, res: Response) => {
     const user = req.user as any;
@@ -68,11 +71,12 @@ const getRideRequests = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const updateRideRequestByRideId = catchAsync(
   async (req: Request, res: Response) => {
     const rideId = req.params.rideId;
     const result = await RideRequestService.updateRideStatusByRideId(
-      req.body,
+      req,
       rideId
     );
     sendResponse(res, {

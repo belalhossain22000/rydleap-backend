@@ -184,19 +184,22 @@ const getAllRideRequestsFromDb = async () => {
 };
 
 // update ride status
-const updateRideStatusByRideId = async (payload: any, rideId: string) => {
+const updateRideStatusByRideId = async (req: any, rideId: string) => {
   const isRideExist = await prisma.ride.findUnique({
     where: {
       id: rideId,
     },
   });
+
   if (!isRideExist) {
     throw new ApiError(httpStatus.NOT_FOUND, "Ride not found");
   }
+
   const updatedRide = await prisma.ride.update({
-    where: { id: rideId },
-    data: payload,
+    where: { id: rideId, riderId: req.user.id },
+    data: req.body,
   });
+
   if (!updatedRide) {
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
