@@ -1,0 +1,35 @@
+import { PaymentInfo } from "@prisma/client";
+import prisma from "../../../shared/prisma";
+
+const createPaymentInfoIntoDB = async (
+  paylaod: PaymentInfo,
+  userId: string
+) => {
+  const resutl = await prisma.paymentInfo.create({
+    data: {
+      ...paylaod,
+      userId: userId,
+    },
+  });
+
+  return resutl;
+};
+
+const getPaymentInfoByUserIdFromDB = async (userId: string) => {
+  const result = await prisma.paymentInfo.findMany({
+    where: {
+      userId: userId,
+    },
+  });
+
+  if (!result) {
+    throw new Error("Payment information not found!");
+  }
+
+  return result;
+};
+
+export const paymentInfoService = {
+  createPaymentInfoIntoDB,
+  getPaymentInfoByUserIdFromDB,
+};

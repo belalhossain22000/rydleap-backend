@@ -40,6 +40,7 @@ model User {
   rydleapProfile         RydleapProfile[]
   userTransactions       UserTransaction[]
   riderTransactions      RiderTransaction[]
+  paymentInfo            PaymentInfo[]
 
   @@map("Users")
 }
@@ -61,6 +62,19 @@ model UserTransaction {
   @@map("UserTransactions")
 }
 
+model PaymentInfo {
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  cardNumber     Int
+  cardHolderName String
+  cvv            Int
+  expirationDate String
+  userId         String @db.ObjectId
+  paymentMethod  String
+  user           User   @relation(fields: [userId], references: [id])
+
+  @@map("paymentInfo")
+}
+
 model RiderTransaction {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   amount        Int
@@ -80,6 +94,7 @@ model Ride {
   id               String             @id @default(auto()) @map("_id") @db.ObjectId
   userId           String?            @unique @db.ObjectId
   riderId          String?            @unique @db.ObjectId
+  fare             Int
   pickupLat        Float
   pickupLng        Float
   destinationLat   Float

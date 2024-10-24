@@ -181,6 +181,7 @@ const getRideRequestByRideId = async (rideId: string) => {
           fullName: true,
           email: true,
           phoneNumber: true,
+          riderReviewsAsCustomer: true,
         },
       },
     },
