@@ -15,6 +15,7 @@ import { StripeRoutes } from "../modules/Stripe/stripe.routes";
 import { userLocationRoute } from "../modules/userLocation/userLocation.route";
 import { paymentRoutes } from "../modules/Paypal/paypal.routes";
 import { paymentInfoRoute } from "../modules/PaymentInfo/paymentInfo.routes";
+import { paymentMethodRoute } from "../modules/PaymentMethod/paymentMethod.routes";
 
 const router = express.Router();
 
@@ -72,6 +73,10 @@ const moduleRoutes = [
   {
     path: "/payment",
     route: paymentRoutes,
+  },
+  {
+    path: "/payment-method",
+    route: paymentMethodRoute,
   },
   {
     path: "/payment-info",
