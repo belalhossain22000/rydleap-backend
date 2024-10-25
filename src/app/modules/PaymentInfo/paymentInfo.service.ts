@@ -22,7 +22,7 @@ const getPaymentInfoByUserIdFromDB = async (userId: string) => {
     },
   });
 
-  if (!result) {
+  if (result.length === 0) {
     throw new Error("Payment information not found!");
   }
 
