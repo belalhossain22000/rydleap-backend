@@ -19,7 +19,7 @@ const getPaymentMethodsByUserIdFromDB = async (userId: string) => {
     },
   });
 
-  if (result.length > 0) {
+  if (result.length === 0) {
     throw new ApiError(404, "Payment Method Not Found");
   }
 

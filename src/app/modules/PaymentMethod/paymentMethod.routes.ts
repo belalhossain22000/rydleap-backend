@@ -5,6 +5,6 @@ import { paymentMethodController } from "./paymentMethod.controller";
 const router = express.Router();
 
 router.post("/create", auth(), paymentMethodController.createPaymentMethod);
-router.post("/", auth(), paymentMethodController.getAllPaymentMethods);
+router.get("/", auth(), paymentMethodController.getAllPaymentMethods);
 
 export const paymentMethodRoute = router;
