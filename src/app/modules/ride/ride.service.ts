@@ -223,7 +223,15 @@ const updateRideStatusByRideId = async (req: any, rideId: string) => {
   const updatedRide = await prisma.ride.update({
     where: { id: rideId, riderId: req.user.id },
     data: req.body,
+    include: {
+      user: true,
+    },
   });
+
+  if (updatedRide.user) {
+    updatedRide.user.password = null;
+    updatedRide.user.fcpmToken = null;
+  }
 
   if (!updatedRide) {
     throw new ApiError(
