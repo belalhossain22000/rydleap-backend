@@ -1,5 +1,6 @@
 import { PaymentInfo } from "@prisma/client";
 import prisma from "../../../shared/prisma";
+import ApiError from "../../errors/ApiErrors";
 
 const createPaymentInfoIntoDB = async (
   paylaod: PaymentInfo,
@@ -23,7 +24,7 @@ const getPaymentInfoByUserIdFromDB = async (userId: string) => {
   });
 
   if (result.length === 0) {
-    throw new Error("Payment information not found!");
+    throw new ApiError(404, "Payment information not found!");
   }
 
   return result;

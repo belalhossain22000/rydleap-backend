@@ -78,14 +78,15 @@ const createUserFirebase = async (payload: any) => {
     );
   }
 
-  await prisma.user.create({
+  const createdUser = await prisma.user.create({
     data: payload,
   });
 
   const accessToken = jwtHelpers.generateToken(
     {
-      email: payload.email,
-      role: payload.role,
+      id: createdUser.id,
+      email: createdUser.email,
+      role: createdUser.role,
     },
     config.jwt.jwt_secret as Secret,
     config.jwt.expires_in as string
