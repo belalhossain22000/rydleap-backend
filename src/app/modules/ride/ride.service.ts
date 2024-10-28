@@ -169,6 +169,31 @@ const getRideRequestsByUserId = async (riderId: string) => {
   return rides;
 };
 
+//view ride request info when see the ride request
+const getRideRequestByRideId = async (rideId: string) => {
+  const ride = await prisma.ride.findUnique({
+    where: {
+      id: rideId,
+    },
+    include: {
+      user: {
+        select: {
+          fullName: true,
+          email: true,
+          phoneNumber: true,
+          riderReviewsAsCustomer: true,
+        },
+      },
+    },
+  });
+
+  if (!ride) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Ride not found");
+  }
+
+  return ride;
+};
+
 const getAllRideRequestsFromDb = async () => {
   const rides = await prisma.ride.findMany({
     orderBy: {
@@ -184,19 +209,30 @@ const getAllRideRequestsFromDb = async () => {
 };
 
 // update ride status
-const updateRideStatusByRideId = async (payload: any, rideId: string) => {
+const updateRideStatusByRideId = async (req: any, rideId: string) => {
   const isRideExist = await prisma.ride.findUnique({
     where: {
       id: rideId,
     },
   });
+
   if (!isRideExist) {
     throw new ApiError(httpStatus.NOT_FOUND, "Ride not found");
   }
+
   const updatedRide = await prisma.ride.update({
-    where: { id: rideId },
-    data: payload,
+    where: { id: rideId, riderId: req.user.id },
+    data: req.body,
+    include: {
+      user: true,
+    },
   });
+
+  if (updatedRide.user) {
+    updatedRide.user.password = null;
+    updatedRide.user.fcpmToken = null;
+  }
+
   if (!updatedRide) {
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
@@ -263,4 +299,5 @@ export const RideRequestService = {
   updateRideStatusByRideId,
   getRideHistoryByRiderId,
   getRideHistoryByUserId,
+  getRideRequestByRideId,
 };

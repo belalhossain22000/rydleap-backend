@@ -255,7 +255,7 @@ const updateFcpTokenIntoDB = async (req: any, res: any) => {
     return result;
   }
 
-  await prisma.user.update({
+  const updatedUser = await prisma.user.update({
     where: { email: mail },
     data: {
       fcpmToken: fcp,
@@ -264,8 +264,9 @@ const updateFcpTokenIntoDB = async (req: any, res: any) => {
 
   const accessToken = jwtHelpers.generateToken(
     {
-      email: bodyData.email,
-      role: bodyData.role,
+      id: updatedUser.id,
+      email: updatedUser.email,
+      role: updatedUser.role,
     },
     config.jwt.jwt_secret as Secret,
     config.jwt.expires_in as string
