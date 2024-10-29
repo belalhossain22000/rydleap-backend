@@ -8,12 +8,14 @@ import {
   saveNewCardWithExistingCustomerPayloadSchema,
   TStripeSaveWithCustomerInfoPayloadSchema,
 } from "./stripe.validation";
+import auth from "../../middlewares/auth";
 
 const router = express.Router();
 
 // create a new customer with card
 router.post(
   "/save-card",
+  auth(),
   validateRequest(TStripeSaveWithCustomerInfoPayloadSchema),
   StripeController.saveCardWithCustomerInfo
 );

@@ -4,8 +4,10 @@ import { StripeServices } from "./stripe.service";
 
 // create a new customer with card
 const saveCardWithCustomerInfo = catchAsync(async (req: any, res: any) => {
+  const userId = req.user.id;
   const result = await StripeServices.saveCardWithCustomerInfoIntoStripe(
-    req.body
+    req.body,
+    userId
   );
 
   sendResponse(res, {

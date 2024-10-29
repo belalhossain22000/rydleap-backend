@@ -4,6 +4,7 @@ import config from "../../../config";
 import ApiError from "../../errors/ApiErrors";
 import { isValidAmount } from "../../utils/isValidAmount";
 import { TStripeSaveWithCustomerInfo } from "./stripe.interface";
+import prisma from "../../../shared/prisma";
 
 // Initialize Stripe with your secret API key
 const stripe = new Stripe(config.stripe_key as string, {
@@ -12,7 +13,8 @@ const stripe = new Stripe(config.stripe_key as string, {
 
 // Step 1: Create a Customer and Save the Card
 const saveCardWithCustomerInfoIntoStripe = async (
-  payload: TStripeSaveWithCustomerInfo
+  payload: TStripeSaveWithCustomerInfo,
+  userId: string
 ) => {
   try {
     const { user, paymentMethodId, address } = payload;
@@ -27,7 +29,7 @@ const saveCardWithCustomerInfoIntoStripe = async (
         country: address.country,
       },
     });
-
+    
     // Attach PaymentMethod to the Customer
     await stripe.paymentMethods.attach(paymentMethodId, {
       customer: customer.id,
@@ -37,6 +39,17 @@ const saveCardWithCustomerInfoIntoStripe = async (
     await stripe.customers.update(customer.id, {
       invoice_settings: {
         default_payment_method: paymentMethodId,
+      },
+    });
+
+
+    // update profile with customerId
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        customerId: customer.id,
       },
     });
 
