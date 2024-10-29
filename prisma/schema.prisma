@@ -80,7 +80,7 @@ model PaymentInfo {
 model PaymentMethod {
   id               String  @id @default(auto()) @map("_id") @db.ObjectId
   userId           String  @db.ObjectId
-  paymentMethod    String
+  paymentMethod    String  @unique
   paymentMethodImg String?
   user             User    @relation(fields: [userId], references: [id])
 

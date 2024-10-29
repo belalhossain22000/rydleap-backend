@@ -3,6 +3,13 @@ import ApiError from "../../errors/ApiErrors";
 
 //for login user
 const createPaymentMethodIntoDB = async (payload: any, userId: string) => {
+  const existingMethod = await prisma.paymentMethod.findUnique({
+    where: { paymentMethod: payload.paymentMethod },
+  });
+
+  if (existingMethod) {
+    throw new ApiError(409, "Payment method already exists");
+  }
   const result = await prisma.paymentMethod.create({
     data: {
       ...payload,
@@ -30,6 +37,13 @@ const getPaymentMethodsByUserIdFromDB = async (userId: string) => {
 
 //for admin
 const createMethod = async (payload: any, userId: string) => {
+  const existingMethod = await prisma.paymentMethod.findUnique({
+    where: { paymentMethod: payload.paymentMethod },
+  });
+
+  if (existingMethod) {
+    throw new ApiError(409, "Payment method already exists");
+  }
   const result = await prisma.paymentMethod.create({
     data: { ...payload, userId: userId },
   });
