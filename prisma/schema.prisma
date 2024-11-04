@@ -255,11 +255,6 @@ enum RideStatus {
   CANCELLED
 }
 
-enum PackageName {
-  Economy
-  PREMIUM
-}
-
 enum PaymentStatus {
   COMPLETED
   PENDING
