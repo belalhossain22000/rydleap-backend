@@ -51,6 +51,7 @@ const sendNotifications = async (req: any) => {
       },
     },
     select: {
+      id: true,
       fcpmToken: true,
     },
   });
@@ -71,12 +72,27 @@ const sendNotifications = async (req: any) => {
 
   const response = await admin.messaging().sendEachForMulticast(message as any);
 
-  response.responses.forEach((res, idx) => {
-    if (!res.success) {
-      console.error(`Error sending to token ${fcmTokens[idx]}:`, res.error);
-    }
+  // Find indices of successful responses
+  const successIndices = response.responses
+    .map((res, idx) => (res.success ? idx : null))
+    .filter((idx) => idx !== null) as number[];
+
+  // Filter users by success indices
+  const successfulUsers = successIndices.map((idx) => users[idx]);
+
+  // Prepare notifications data for only successfully notified users
+  const notificationData = successfulUsers.map((user) => ({
+    receiverId: user.id,
+    title: req.body.title,
+    body: req.body.body,
+  }));
+
+  // Save notifications for successfully notified users
+  await prisma.notifications.createMany({
+    data: notificationData,
   });
 
+  // Collect failed tokens
   const failedTokens = response.responses
     .map((res, idx) => (!res.success ? fcmTokens[idx] : null))
     .filter((token) => token !== null);
