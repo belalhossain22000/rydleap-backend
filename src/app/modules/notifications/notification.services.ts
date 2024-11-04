@@ -19,6 +19,15 @@ const sendSingleNotification = async (req: any) => {
     },
     token: user.fcpmToken,
   };
+
+  await prisma.notifications.create({
+    data: {
+      receiverId: req.params.userId,
+      title: req.body.title,
+      body: req.body.body,
+    },
+  });
+
   try {
     const response = await admin.messaging().send(message);
     return response;
@@ -79,7 +88,42 @@ const sendNotifications = async (req: any) => {
   };
 };
 
+const getNotificationsFromDB = async (req: any) => {
+  const notifications = await prisma.notifications.findMany({
+    where: {
+      receiverId: req.user.id,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (notifications.length === 0) {
+    throw new ApiError(404, "No notifications found for the user");
+  }
+
+  return notifications;
+};
+
+const getSingleNotificationFromDB = async (
+  req: any,
+  notificationId: string
+) => {
+  const notification = await prisma.notifications.findFirst({
+    where: {
+      id: notificationId,
+      receiverId: req.user.id,
+    },
+  });
+
+  if (!notification) {
+    throw new ApiError(404, "Notification not found for the user");
+  }
+
+  return notification;
+};
+
 export const notificationServices = {
   sendSingleNotification,
   sendNotifications,
+  getNotificationsFromDB,
+  getSingleNotificationFromDB,
 };

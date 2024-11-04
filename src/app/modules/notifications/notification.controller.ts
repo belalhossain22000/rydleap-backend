@@ -24,7 +24,35 @@ const sendNotifications = catchAsync(async (req: any, res: any) => {
   });
 });
 
+const getNotifications = catchAsync(async (req: any, res: any) => {
+  const notifications = await notificationServices.getNotificationsFromDB(req);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Notifications retrieved successfully",
+    data: notifications,
+  });
+});
+
+const getSingleNotificationById = catchAsync(async (req: any, res: any) => {
+  const notificationId = req.params.notificationId;
+  const notification = await notificationServices.getSingleNotificationFromDB(
+    req,
+    notificationId
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Notification retrieved successfully",
+    data: notification,
+  });
+});
+
 export const notificationController = {
   sendNotification,
   sendNotifications,
+  getNotifications,
+  getSingleNotificationById,
 };

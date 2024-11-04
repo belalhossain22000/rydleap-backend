@@ -16,4 +16,11 @@ router.post(
   notificationController.sendNotifications
 );
 
+router.get("/", auth(), notificationController.getNotifications);
+router.get(
+  "/:notificationId",
+  auth(),
+  notificationController.getSingleNotificationById
+);
+
 export const notificationsRoute = router;

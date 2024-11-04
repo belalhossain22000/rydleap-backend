@@ -43,6 +43,7 @@ model User {
   riderTransactions      RiderTransaction[]
   paymentInfo            PaymentInfo[]
   paymentMethod          PaymentMethod[]
+  notifications          Notifications[]
 
   @@map("Users")
 }
@@ -216,6 +217,17 @@ model RydleapProfile {
   updatedAt       DateTime @updatedAt
 
   @@map("RydleapProfiles")
+}
+
+model Notifications {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  receiverId String   @db.ObjectId
+  title      String
+  body       String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [receiverId], references: [id])
 }
 
 enum UserRole {
