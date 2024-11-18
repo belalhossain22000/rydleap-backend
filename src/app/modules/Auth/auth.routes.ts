@@ -20,11 +20,7 @@ router.post("/logout", AuthController.logoutUser);
 
 // generate refresh token for getting access token
 
-router.get(
-  "/get-me",
-  auth(UserRole.ADMIN, UserRole.USER, UserRole.RIDER),
-  AuthController.getMyProfile
-);
+router.get("/get-me", auth(), AuthController.getMyProfile);
 
 router.put(
   "/change-password",

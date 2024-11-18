@@ -56,35 +56,23 @@ const loginUser = async (payload: { email: string; password: string }) => {
 };
 
 // get user profile
-const getMyProfile = async (user: any) => {
-  const userInfo = await prisma.user.findUnique({
+const getMyProfile = async (userId: string) => {
+  const userInfo: any = await prisma.user.findUnique({
     where: {
-      id: user.id,
-      status: UserStatus.ACTIVE,
-    },
-    select: {
-      id: true,
-      email: true,
-      role: true,
-      status: true,
+      id: userId,
     },
   });
 
-  let profileInfo;
-
-  if (userInfo?.role === UserRole.USER) {
-    profileInfo = await prisma.user.findUnique({
-      where: {
-        email: userInfo?.email,
-      },
-    });
+  if (!userInfo) {
+    throw new ApiError(404, "User info not found");
   }
 
-  return { ...userInfo, ...profileInfo };
+  const { password, ...sanitizedUser } = userInfo;
+
+  return sanitizedUser;
 };
 
 // change password
-
 const changePassword = async (user: any, payload: any) => {
   const userData = await prisma.user.findUnique({
     where: { id: user?.id },

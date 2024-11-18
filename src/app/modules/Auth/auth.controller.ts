@@ -39,10 +39,10 @@ const logoutUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 // get user profile
-const getMyProfile = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user;
+const getMyProfile = catchAsync(async (req: any, res: Response) => {
+  const userId = req.user.id;
 
-  const result = await AuthServices.getMyProfile(user);
+  const result = await AuthServices.getMyProfile(userId);
   sendResponse(res, {
     success: true,
     statusCode: 201,
