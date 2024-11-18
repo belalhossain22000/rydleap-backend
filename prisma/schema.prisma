@@ -24,6 +24,8 @@ model User {
   phoneNumber            String?
   isPhoenVerified        Boolean            @default(false)
   password               String?
+  fcpmToken              String?
+  customerId             String?
   role                   UserRole           @default(USER)
   status                 UserStatus         @default(INACTIVE)
   isOnline               Boolean?           @default(false)
@@ -31,71 +33,99 @@ model User {
   isAvailable            Boolean?           @default(true)
   createdAt              DateTime           @default(now())
   updatedAt              DateTime           @updatedAt
-  riderVehicleInfo       RiderVehicleInfo[]
-  locations              UserLocation[]     @relation("UserLocations")
-  ridesAsCustomer        Ride[]             @relation("RidesAsCustomer")
-  ridesAsRider           Ride[]             @relation("RidesAsRider")
-  riderReviewsAsRider    RiderReview[]      @relation("RiderReviewsAsRider")
-  riderReviewsAsCustomer RiderReview[]      @relation("RiderReviewsAsCustomer")
-  userConversations      UserConversation[]
-  messages               Message[]          @relation("MessageSender")
+  riderVehicleInfo       RiderVehicleInfo?
+  locations              UserLocation?      @relation("UserLocation")
+  ridesAsCustomer        Ride?              @relation("RidesAsCustomer")
+  ridesAsRider           Ride?              @relation("RidesAsRider")
+  riderReviewsAsRider    RiderReview?       @relation("RiderReviewsAsRider")
+  riderReviewsAsCustomer RiderReview?       @relation("RiderReviewsAsCustomer")
+  rydleapProfile         RydleapProfile[]
+  userTransactions       UserTransaction[]
+  riderTransactions      RiderTransaction[]
+  paymentInfo            PaymentInfo[]
+  paymentMethod          PaymentMethod[]
+  notifications          Notifications[]
 
   @@map("Users")
 }
 
-// Conversation model
-model Conversation {
-  id           String             @id @default(auto()) @map("_id") @db.ObjectId
-  messages     Message[]          @relation("ConversationMessages")
-  participants UserConversation[]
+model UserTransaction {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  amount          Int
+  userId          String        @db.ObjectId
+  rideId          String        @db.ObjectId
+  riderId         String        @db.ObjectId
+  orderId         String
+  url             String?
+  status          PaymentStatus @default(PENDING)
+  paymentMethod   String
+  transactionType String        @default("Ride Fare")
+  user            User          @relation(fields: [userId], references: [id])
+  ride            Ride          @relation(fields: [rideId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@map("UserTransactions")
 }
 
-// Message model
-model Message {
-  id             String       @id @default(auto()) @map("_id") @db.ObjectId
-  conversationId String       @db.ObjectId
-  conversation   Conversation @relation(name: "ConversationMessages", fields: [conversationId], references: [id], onDelete: Cascade)
+model PaymentInfo {
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  cardNumber     Int
+  cardHolderName String?
+  cvv            Int
+  expirationDate String
+  country        String
+  userId         String  @db.ObjectId
+  paymentMethod  String
+  user           User    @relation(fields: [userId], references: [id])
 
-  senderId String @db.ObjectId
-  sender   User   @relation("MessageSender", fields: [senderId], references: [id])
-
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@map("paymentInfo")
 }
 
-// Intermediary model for the many-to-many relationship
-model UserConversation {
-  id             String       @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String       @db.ObjectId
-  conversationId String       @db.ObjectId
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+model PaymentMethod {
+  id               String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String  @db.ObjectId
+  paymentMethod    String  @unique
+  paymentMethodImg String?
+  user             User    @relation(fields: [userId], references: [id])
+
+  @@map("paymentMethods")
+}
+
+model RiderTransaction {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  amount        Int
+  riderId       String        @db.ObjectId
+  rideId        String        @db.ObjectId
+  userId        String        @db.ObjectId
+  orderId       String        @db.ObjectId
+  status        PaymentStatus @default(PENDING)
+  paymentMethod String
+  rider         User          @relation(fields: [riderId], references: [id])
+  ride          Ride          @relation(fields: [rideId], references: [id])
+
+  @@map("RiderTransactions")
 }
 
 model Ride {
-  id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String        @db.ObjectId
-  riderId        String?       @db.ObjectId
-  pickupLat      Float
-  pickupLng      Float
-  destinationLat Float
-  destinationLng Float
-  date           String?
-  time           String?
-  packageId      String        @db.ObjectId
-  status         RideStatus    @default(PENDING)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  package        Package       @relation(fields: [packageId], references: [id])
-  user           User          @relation("RidesAsCustomer", fields: [userId], references: [id])
-  rider          User?         @relation("RidesAsRider", fields: [riderId], references: [id])
-  RiderReview    RiderReview[]
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String?            @unique @db.ObjectId
+  riderId          String?            @unique @db.ObjectId
+  fare             Int
+  pickupLat        Float
+  pickupLng        Float
+  destinationLat   Float
+  destinationLng   Float
+  date             String?
+  time             String?
+  packageId        String             @unique @db.ObjectId
+  status           RideStatus         @default(PENDING)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  package          Package?           @relation(fields: [packageId], references: [id])
+  user             User?              @relation("RidesAsCustomer", fields: [userId], references: [id])
+  rider            User?              @relation("RidesAsRider", fields: [riderId], references: [id])
+  RiderReview      RiderReview[]
+  userTransaction  UserTransaction[]
+  riderTransaction RiderTransaction[]
 
   @@map("Rides")
 }
@@ -103,8 +133,8 @@ model Ride {
 model RiderReview {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   rideId     String   @db.ObjectId
-  riderId    String   @db.ObjectId
-  customerId String   @db.ObjectId
+  riderId    String   @unique @db.ObjectId
+  customerId String   @unique @db.ObjectId
   rating     Int
   comment    String?
   createdAt  DateTime @default(now())
@@ -119,12 +149,12 @@ model RiderReview {
 // user location table
 model UserLocation {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId
+  userId      String   @unique @db.ObjectId
   locationLat Float
   locationLng Float
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  user        User     @relation("UserLocations", fields: [userId], references: [id])
+  user        User     @relation("UserLocation", fields: [userId], references: [id])
 
   @@map("usersLocations")
 }
@@ -154,7 +184,7 @@ model RiderVehicleInfo {
   vehicleRegistrationImage  Json
   vehicleInsuranceImage     Json
   drivingLicenceImage       Json
-  userId                    String   @db.ObjectId
+  userId                    String   @unique @db.ObjectId
   user                      User     @relation(fields: [userId], references: [id])
   createdAt                 DateTime @default(now())
   updatedAt                 DateTime @updatedAt
@@ -171,6 +201,34 @@ model Offer {
   updatedAt DateTime @updatedAt
 
   @@map("Offers")
+}
+
+model RydleapProfile {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  adminId         String   @db.ObjectId
+  admin           User     @relation(fields: [adminId], references: [id])
+  supportEmail    String
+  phoneNumber     String
+  address         String
+  currency        String
+  defaultLanguage String
+  fullName        String
+  logo            Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("RydleapProfiles")
+}
+
+model Notifications {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  receiverId String   @db.ObjectId
+  title      String
+  body       String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [receiverId], references: [id])
 }
 
 enum UserRole {
@@ -198,7 +256,7 @@ enum RideStatus {
   CANCELLED
 }
 
-enum PackageName {
-  Economy
-  PREMIUM
+enum PaymentStatus {
+  COMPLETED
+  PENDING
 }

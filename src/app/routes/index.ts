@@ -1,15 +1,22 @@
 import express from "express";
-import { userRoutes } from "../modules/User/user.route";
 import { AuthRoutes } from "../modules/Auth/auth.routes";
 import { SendMessageRoutes } from "../modules/otp/otp.route";
+import { userRoutes } from "../modules/User/user.route";
 // import { RiderVehicleInfoRoutes } from "../modules/riderVehicleInfo/riderVehicleInfo.route";
-import { rideRoute } from "../modules/ride/ride.route";
-import { packageRoute } from "../modules/package/package.route";
-import { RiderVehicleInfoRoutes } from "../modules/riderVehicleInfo/riderVehicleInfo.route";
-import { RiderReviewRoute } from "../modules/RiderReview/riderReview.route";
 import { contactRoutes } from "../modules/contact/contact.route";
+import { notificationsRoute } from "../modules/notifications/notification.route";
+import { packageRoute } from "../modules/package/package.route";
 import { promotionsRoute } from "../modules/promotions/promotion.routes";
-import { chatRoutes } from "../modules/chat/chat.route";
+import { rideRoute } from "../modules/ride/ride.route";
+import { RiderReviewRoute } from "../modules/RiderReview/riderReview.route";
+import { RiderVehicleInfoRoutes } from "../modules/riderVehicleInfo/riderVehicleInfo.route";
+import { rydleapRoutes } from "../modules/rydleap/rydleap.route";
+import { StripeRoutes } from "../modules/Stripe/stripe.routes";
+import { userLocationRoute } from "../modules/userLocation/userLocation.route";
+import { paymentRoutes } from "../modules/Paypal/paypal.routes";
+import { paymentInfoRoute } from "../modules/PaymentInfo/paymentInfo.routes";
+import { paymentMethodRoute } from "../modules/PaymentMethod/paymentMethod.routes";
+import { transactionRoutes } from "../modules/Transactions/transaction.routes";
 
 const router = express.Router();
 
@@ -51,8 +58,38 @@ const moduleRoutes = [
     route: promotionsRoute,
   },
   {
-    path: "/conversations",
-    route: chatRoutes,
+    path: "/rydleap",
+    route: rydleapRoutes,
+  },
+  {
+    path: "/user-location",
+    route: userLocationRoute,
+  },
+
+  {
+    path: "/notifications",
+    route: notificationsRoute,
+  },
+
+  {
+    path: "/payment",
+    route: paymentRoutes,
+  },
+  {
+    path: "/payment-method",
+    route: paymentMethodRoute,
+  },
+  {
+    path: "/payment-info",
+    route: paymentInfoRoute,
+  },
+  {
+    path: "/stripe",
+    route: StripeRoutes,
+  },
+  {
+    path: "/transactions",
+    route: transactionRoutes,
   },
 ];
 

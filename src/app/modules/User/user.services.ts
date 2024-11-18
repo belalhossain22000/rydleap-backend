@@ -65,6 +65,37 @@ const createUserIntoDb = async (payload: any) => {
   return withoutPasswordUser;
 };
 
+//create a new user for firebase registration
+const createUserFirebase = async (payload: any) => {
+  const existingUser = await prisma.user.findUnique({
+    where: { email: payload.email },
+  });
+
+  if (existingUser) {
+    throw new ApiError(
+      httpStatus.CONFLICT,
+      `User already exists with this  ${payload.email}`
+    );
+  }
+
+  const createdUser = await prisma.user.create({
+    data: payload,
+  });
+
+  const accessToken = jwtHelpers.generateToken(
+    {
+      id: createdUser.id,
+      email: createdUser.email,
+      role: createdUser.role,
+    },
+    config.jwt.jwt_secret as Secret,
+    config.jwt.expires_in as string
+  );
+
+  const result = { accessToken };
+  return result;
+};
+
 // social login
 const socialLogin = async (payload: any) => {
   // Check if the user exists in the database
@@ -85,6 +116,28 @@ const socialLogin = async (payload: any) => {
 
     return accessToken;
   } else {
+    const hashedPassword = bcrypt.hashSync(payload.password, 12);
+    if (hashedPassword) {
+      user = await prisma.user.create({
+        data: {
+          ...payload,
+          password: hashedPassword,
+        },
+      });
+
+      const accessToken = jwtHelpers.generateToken(
+        {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        },
+        config.jwt.jwt_secret as Secret,
+        config.jwt.expires_in as string
+      );
+
+      return accessToken;
+    }
+
     user = await prisma.user.create({
       data: {
         ...payload,
@@ -159,6 +212,8 @@ const getUsersFromDb = async (
       status: true,
       createdAt: true,
       updatedAt: true,
+      locations: true,
+      riderReviewsAsCustomer: true,
     },
   });
 
@@ -176,6 +231,23 @@ const getUsersFromDb = async (
     },
     data: result,
   };
+};
+
+const getUsersFromDB = async () => {
+  const result = await prisma.user.findMany({
+    where: {
+      role: "USER",
+    },
+    select: {
+      id: true,
+      role: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  return result;
 };
 
 // reterive all riders from the database
@@ -233,6 +305,9 @@ const getRidersFromDb = async (
       status: true,
       createdAt: true,
       updatedAt: true,
+      locations: true,
+      riderVehicleInfo: true,
+      riderReviewsAsRider: true,
     },
   });
 
@@ -252,14 +327,35 @@ const getRidersFromDb = async (
   };
 };
 
+const getRidersFromDB = async () => {
+  const result = await prisma.user.findMany({
+    where: {
+      role: "RIDER",
+    },
+    select: {
+      id: true,
+      role: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  return result;
+};
+
 const getSingleUserFromDb = async (userId: string) => {
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
       id: userId,
-      role: "USER",
     },
     include: {
-      ridesAsCustomer: true,
+      ridesAsCustomer: {
+        where: {
+          status: "COMPLETED",
+        },
+      },
+      riderReviewsAsCustomer: true,
     },
   });
 
@@ -278,7 +374,12 @@ const getSingleRiderFromDb = async (userId: string) => {
     },
     include: {
       riderVehicleInfo: true,
-      ridesAsRider: true,
+      riderReviewsAsRider: true,
+      ridesAsRider: {
+        where: {
+          status: "COMPLETED",
+        },
+      },
     },
   });
 
@@ -356,10 +457,13 @@ const updateUserIntoDb = async (payload: IUser, id: string) => {
 export const userService = {
   createUserIntoDb,
   getUsersFromDb,
+  getUsersFromDB,
   getRidersFromDb,
+  getRidersFromDB,
   updateProfile,
   updateUserIntoDb,
   socialLogin,
   getSingleUserFromDb,
   getSingleRiderFromDb,
+  createUserFirebase,
 };

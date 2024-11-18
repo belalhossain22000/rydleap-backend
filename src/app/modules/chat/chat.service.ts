@@ -124,7 +124,7 @@ const getAllConversations = async (userId: string) => {
       },
     },
     include: {
-      messages: true,
+      // messages: true,
       participants: true,
     },
   });

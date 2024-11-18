@@ -10,19 +10,29 @@ const router = express.Router();
 
 // create user
 router.post("/register", userController.createUser);
+
+//create user for firebase registration
+router.post("/register-firebase", userController.createFirebaseUser);
+
 // create user
 router.post("/social", userController.socialLogin);
 // *!get all  user
 router.get("/", userController.getUsers);
 
+//for dashboard
+router.get("/all-users", userController.getAllUsers);
+
 //get all riders
-router.get("/riders", userController.getRiders);
+router.get("/riders", auth(), userController.getRiders);
+
+//for dashboard
+router.get("/all-riders", userController.getAllRiders);
 
 //get single user
 router.get("/:userId", userController.getUserById);
 
 //get single rider
-router.get("/single-rider/:riderId", userController.getRiderById);
+router.get("/single-rider/:riderId", auth(), userController.getRiderById);
 
 // *!profile user
 router.put(

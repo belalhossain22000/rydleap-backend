@@ -1,13 +1,10 @@
 import { Server } from "http";
-import { WebSocketServer, WebSocket } from "ws"; // WebSocketServer from 'ws'
+import { WebSocketServer, WebSocket } from "ws";
 import config from "./config";
 import app from "./app";
-import { ChatService } from "./app/modules/chat/chat.service";
+import { PrismaClient, UserRole } from "@prisma/client";
 
-// Extend WebSocket interface to include roomId
-interface ExtendedWebSocket extends WebSocket {
-  roomId?: string; // Optional property for tracking the conversation
-}
+const prisma = new PrismaClient();
 
 async function main() {
   const server: Server = app.listen(config.port, () => {
@@ -17,83 +14,63 @@ async function main() {
   // Initialize WebSocket server
   const wss = new WebSocketServer({ server });
 
-  wss.on("connection", (ws: ExtendedWebSocket) => {
+  // Store active WebSocket connections
+  const connections: Map<string, { ws: WebSocket; role: "RIDER" | "USER" }> = new Map();
+
+  wss.on("connection", (ws: WebSocket, req) => {
     console.log("New client connected");
 
-    // Handle messages from the client
-    ws.on("message", async (data: string) => {
-      try {
-        const parsedData = JSON.parse(data);
+    // Handle initial message to register user
+    ws.on("message", async (message: string) => {
+      const { type, userId, role, location } = JSON.parse(message);
 
-        switch (parsedData.type) {
-          case "joinRoom": {
-            const { user1Id, user2Id } = parsedData;
-            const conversation = await ChatService.createConversation(
-              parsedData
-            );
+      switch (type) {
+        case "register":
+          // Register the connection
+          connections.set(userId, { ws, role });
+          console.log(`User ${userId} (${role}) registered`);
+          break;
 
-            // Assign roomId to WebSocket connection
-            ws.roomId = conversation.id;
+        case "location-update":
+          // Handle location updates
+          const { lat, lng } = location;
 
-            // Load all messages and send them to the user
-            const conversationWithMessages =
-              await ChatService.getMessagesInConversation(conversation.id);
-            ws.send(
-              JSON.stringify({
-                type: "loadMessages",
-                conversation: conversationWithMessages,
-              })
-            );
-            break;
+          // Save the latest location to the database
+          await prisma.userLocation.upsert({
+            where: { userId },
+            update: { locationLat: lat, locationLng: lng },
+            create: { userId, locationLat: lat, locationLng: lng },
+          });
+
+          // Broadcast location update to relevant user
+          const targetRole = role === "RIDER" ? "USER" : "RIDER";
+          for (const [targetId, connection] of connections.entries()) {
+            if (connection.role === targetRole) {
+              connection.ws.send(
+                JSON.stringify({
+                  type: "location-update",
+                  userId,
+                  location: { lat, lng },
+                })
+              );
+            }
           }
+          break;
 
-          case "sendMessage": {
-            const { chatroomId, senderId, senderName, content } = parsedData;
-
-            // Create a new message in the conversation
-            const message = await ChatService.sendMessage(parsedData);
-
-            // Broadcast the message to all users in the same chatroom
-            wss.clients.forEach((client: ExtendedWebSocket) => {
-              if (
-                client.roomId === chatroomId &&
-                client.readyState === WebSocket.OPEN
-              ) {
-                client.send(
-                  JSON.stringify({ type: "receiveMessage", message })
-                );
-              }
-            });
-            break;
-          }
-
-          case "typing": {
-            const { typingRoomId, username } = parsedData;
-
-            // Broadcast typing status to other users in the room
-            wss.clients.forEach((client: ExtendedWebSocket) => {
-              if (
-                client.roomId === typingRoomId &&
-                client !== ws &&
-                client.readyState === WebSocket.OPEN
-              ) {
-                client.send(JSON.stringify({ type: "typing", username }));
-              }
-            });
-            break;
-          }
-
-          default:
-            console.log("Unknown message type:", parsedData.type);
-        }
-      } catch (error) {
-        console.error("Error handling WebSocket message:", error);
+        default:
+          console.log("Unknown message type");
       }
     });
 
     // Handle WebSocket disconnect
     ws.on("close", () => {
-      console.log("Client disconnected");
+      for (const [userId, connection] of connections.entries()) {
+        if (connection.ws === ws) {
+          connections.delete(userId);
+          console.log(`User ${userId} disconnected`);
+          break;
+        }
+      }
     });
   });
 
@@ -107,7 +84,6 @@ async function main() {
     process.exit(1);
   };
 
-  // Handle errors and rejections
   process.on("uncaughtException", (error) => {
     console.error("Uncaught Exception:", error);
     exitHandler();
@@ -119,5 +95,4 @@ async function main() {
   });
 }
 
-// Start the server
 main();

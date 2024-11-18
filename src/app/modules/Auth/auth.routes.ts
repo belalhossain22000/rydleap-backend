@@ -20,7 +20,6 @@ router.post("/logout", AuthController.logoutUser);
 
 // generate refresh token for getting access token
 
-
 router.get(
   "/get-me",
   auth(UserRole.ADMIN, UserRole.USER, UserRole.RIDER),
@@ -41,11 +40,20 @@ router.patch("/reset-password-app", AuthController.resetPasswordFromApp);
 
 // social login
 // Initiate Google login
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
 
 // Handle the Google OAuth callback
-router.get('/google/callback', passport.authenticate('google', { session: false }), (req, res) => {
-  // JWT generation and response here
-});
+router.get(
+  "/google/callback",
+  passport.authenticate("google", { session: false }),
+  (req, res) => {
+    // JWT generation and response here
+  }
+);
+
+router.patch("/update-fcp/:mail/:fcp", AuthController.updateFcpToken);
 
 export const AuthRoutes = router;

@@ -15,6 +15,7 @@ const upload = multer({ storage: storage });
 
 // upload single image
 const uploadprofileImage = upload.single("profileImage");
+const uploadSiteLogo = upload.single("siteLogo");
 
 // upload multiple image
 const uploadRiderVehicleInfo = upload.fields([
@@ -27,4 +28,5 @@ export const fileUploader = {
   upload,
   uploadprofileImage,
   uploadRiderVehicleInfo,
+  uploadSiteLogo,
 };

@@ -20,7 +20,7 @@ const createRideRequest = async (payload: any, user: any) => {
       userId: user.id,
       status: {
         not: {
-          in: ["COMPLETED", "CANCELLED"],
+          in: ["COMPLETED", "CANCELLED",],
         },
       },
     },
@@ -33,24 +33,13 @@ const createRideRequest = async (payload: any, user: any) => {
     );
   }
 
-  // Create the new ride request
-  const ride = await prisma.ride.create({
-    data: { ...payload, userId: user.id },
-  });
-
-  if (!ride) {
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      "Failed to create ride request"
-    );
-  }
-
   // Find the nearest available rider
   const { pickupLat, pickupLng } = payload;
 
   const riders = await prisma.user.findMany({
     where: {
       role: "RIDER",
+      // isOnline: true,
       status: "ACTIVE",
       isAvailable: true,
     },
@@ -90,10 +79,21 @@ const createRideRequest = async (payload: any, user: any) => {
   let nearestRider = null;
   let nearestDistance = Infinity;
 
+  // for (const rider of riders) {
+  //   console.log("Rider:", rider);
+
+  //   if (rider.locations.length > 0) {
+  //     const riderLocation = rider.locations[0];
+  //     console.log(`Rider ${rider.id} location:`, riderLocation);
+  //   } else {
+  //     console.log(`Rider ${rider.id} has no location.`);
+  //   }
+  // }
+
   for (const rider of riders) {
     // Check if the rider has a location entry
-    if (rider.locations.length > 0) {
-      const riderLocation = rider.locations[0];
+    if (rider.locations) {
+      const riderLocation = rider.locations;
       const distance = haversineDistance(
         pickupLat,
         pickupLng,
@@ -110,10 +110,15 @@ const createRideRequest = async (payload: any, user: any) => {
   }
 
   if (nearestRider) {
+    // Create the new ride request
+    const ride = await prisma.ride.create({
+      data: { ...payload, userId: user.id },
+    });
+
     // Update the ride request with the assigned rider
     const updatedRide = await prisma.ride.update({
       where: { id: ride.id },
-      data: { riderId: nearestRider.id, status: "PENDING" },
+      data: { riderId: nearestRider.id, status: "ACCEPTED" },
     });
 
     return {
@@ -133,9 +138,17 @@ const getRideRequestsByRiderId = async (riderId: string) => {
       status: "PENDING",
     },
     include: {
-      user: true,
-      rider: true,
-      package: true,
+      user: {
+        include: {
+          locations: true,
+        },
+      },
+      rider: {
+        include: {
+          locations: true,
+        },
+      },
+      // package: true,
     },
   });
 
@@ -153,8 +166,16 @@ const getRideRequestsByUserId = async (riderId: string) => {
       status: "PENDING",
     },
     include: {
-      user: true,
-      rider: true,
+      user: {
+        include: {
+          locations: true,
+        },
+      },
+      rider: {
+        include: {
+          locations: true,
+        },
+      },
       package: true,
     },
   });
@@ -163,6 +184,34 @@ const getRideRequestsByUserId = async (riderId: string) => {
     return "No pending ride requests found for this rider";
   }
   return rides;
+};
+
+//view ride request info when see the ride request
+const getRideRequestByRideId = async (rideId: string) => {
+  const ride = await prisma.ride.findUnique({
+    where: {
+      id: rideId,
+    },
+    include: {
+      user: {
+        select: {
+          fullName: true,
+          email: true,
+          phoneNumber: true,
+          riderReviewsAsCustomer: true,
+        },
+        include: {
+          locations: true,
+        },
+      },
+    },
+  });
+
+  if (!ride) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Ride not found");
+  }
+
+  return ride;
 };
 
 const getAllRideRequestsFromDb = async () => {
@@ -180,19 +229,30 @@ const getAllRideRequestsFromDb = async () => {
 };
 
 // update ride status
-const updateRideStatusByRideId = async (payload: any, rideId: string) => {
+const updateRideStatusByRideId = async (req: any, rideId: string) => {
   const isRideExist = await prisma.ride.findUnique({
     where: {
       id: rideId,
     },
   });
+
   if (!isRideExist) {
     throw new ApiError(httpStatus.NOT_FOUND, "Ride not found");
   }
+
   const updatedRide = await prisma.ride.update({
-    where: { id: rideId },
-    data: payload,
+    where: { id: rideId, riderId: req.user.id },
+    data: req.body,
+    include: {
+      user: true,
+    },
   });
+
+  if (updatedRide.user) {
+    updatedRide.user.password = null;
+    updatedRide.user.fcpmToken = null;
+  }
+
   if (!updatedRide) {
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
@@ -227,7 +287,7 @@ const getRideHistoryByRiderId = async (riderId: string) => {
   return rides;
 };
 
-// get rider history by user id
+// get user history by user id
 const getRideHistoryByUserId = async (userId: string) => {
   const rides = await prisma.ride.findMany({
     where: {
@@ -245,7 +305,7 @@ const getRideHistoryByUserId = async (userId: string) => {
   if (rides.length === 0) {
     throw new ApiError(
       httpStatus.NOT_FOUND,
-      "No ride history found for this rider"
+      "No user history found for this rider"
     );
   }
   return rides;
@@ -259,4 +319,5 @@ export const RideRequestService = {
   updateRideStatusByRideId,
   getRideHistoryByRiderId,
   getRideHistoryByUserId,
+  getRideRequestByRideId,
 };
