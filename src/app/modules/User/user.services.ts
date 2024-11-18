@@ -99,7 +99,7 @@ const createUserFirebase = async (payload: any) => {
 // social login
 const socialLogin = async (payload: any) => {
   // Check if the user exists in the database
-  let user = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { email: payload.email },
   });
 
@@ -115,39 +115,41 @@ const socialLogin = async (payload: any) => {
     );
 
     return accessToken;
+  }
+
+  if (payload.password) {
+    const hashedPassword = await bcrypt.hash(
+      payload.password,
+      Number(config.bcrypt_salt_rounds)
+    );
+    const createUser = await prisma.user.create({
+      data: {
+        ...payload,
+        password: hashedPassword,
+      },
+    });
+
+    const accessToken = jwtHelpers.generateToken(
+      {
+        id: createUser.id,
+        email: createUser.email,
+        role: createUser.role,
+      },
+      config.jwt.jwt_secret as Secret,
+      config.jwt.expires_in as string
+    );
+    return accessToken;
   } else {
-    const hashedPassword = bcrypt.hashSync(payload.password, 12);
-    if (hashedPassword) {
-      user = await prisma.user.create({
-        data: {
-          ...payload,
-          password: hashedPassword,
-        },
-      });
-
-      const accessToken = jwtHelpers.generateToken(
-        {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-        },
-        config.jwt.jwt_secret as Secret,
-        config.jwt.expires_in as string
-      );
-
-      return accessToken;
-    }
-
-    user = await prisma.user.create({
+    const createdUserWithoutPassword = await prisma.user.create({
       data: {
         ...payload,
       },
     });
     const accessToken = jwtHelpers.generateToken(
       {
-        id: user.id,
-        email: user.email,
-        role: user.role,
+        id: createdUserWithoutPassword.id,
+        email: createdUserWithoutPassword.email,
+        role: createdUserWithoutPassword.role,
       },
       config.jwt.jwt_secret as Secret,
       config.jwt.expires_in as string
