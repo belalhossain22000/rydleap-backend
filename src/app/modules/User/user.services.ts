@@ -116,6 +116,28 @@ const socialLogin = async (payload: any) => {
 
     return accessToken;
   } else {
+    const hashedPassword = bcrypt.hashSync(payload.password, 12);
+    if (hashedPassword) {
+      user = await prisma.user.create({
+        data: {
+          ...payload,
+          password: hashedPassword,
+        },
+      });
+
+      const accessToken = jwtHelpers.generateToken(
+        {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        },
+        config.jwt.jwt_secret as Secret,
+        config.jwt.expires_in as string
+      );
+
+      return accessToken;
+    }
+
     user = await prisma.user.create({
       data: {
         ...payload,

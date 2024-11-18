@@ -134,6 +134,11 @@ const getSingleNotificationFromDB = async (
     throw new ApiError(404, "Notification not found for the user");
   }
 
+  await prisma.notifications.update({
+    where: { id: notificationId },
+    data: { read: true },
+  });
+
   return notification;
 };
 

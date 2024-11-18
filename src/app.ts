@@ -14,8 +14,9 @@ export const corsOptions = {
     "http://localhost:3001",
     "http://localhost:3000",
     "https://rydleap-dashboard.vercel.app",
+    "https://rydleap-web.vercel.app",
   ],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 };
