@@ -15,7 +15,8 @@ async function main() {
   const wss = new WebSocketServer({ server });
 
   // Store active WebSocket connections
-  const connections: Map<string, { ws: WebSocket; role: "RIDER" | "USER" }> = new Map();
+  const connections: Map<string, { ws: WebSocket; role: "RIDER" | "USER" }> =
+    new Map();
 
   wss.on("connection", (ws: WebSocket, req) => {
     console.log("New client connected");
@@ -36,14 +37,20 @@ async function main() {
           const { lat, lng } = location;
 
           // Save the latest location to the database
-          await prisma.userLocation.upsert({
+          const result = await prisma.userLocation.upsert({
             where: { userId },
             update: { locationLat: lat, locationLng: lng },
             create: { userId, locationLat: lat, locationLng: lng },
           });
-
+          // ws.send(
+          //   JSON.stringify({
+          //     type: "location-update",
+          //     userId,
+          //     location: { lat, lng },
+          //   })
+          // );
           // Broadcast location update to relevant user
-          const targetRole = role === "RIDER" ? "USER" : "RIDER";
+          const targetRole = role === "RIDER" ? "RIDER" : "USER";
           for (const [targetId, connection] of connections.entries()) {
             if (connection.role === targetRole) {
               connection.ws.send(
