@@ -12,7 +12,7 @@ async function main() {
   });
 
   // Initialize WebSocket server
-  const wss = new WebSocketServer({ server, path: "/ws" });
+  const wss = new WebSocketServer({ server });
 
   // Store active WebSocket connections
   const connections: Map<string, { ws: WebSocket; role: "RIDER" | "USER" }> =
@@ -37,12 +37,12 @@ async function main() {
           const { lat, lng } = location;
 
           // Save the latest location to the database
-          const result = await prisma.userLocation.upsert({
+           await prisma.userLocation.upsert({
             where: { userId },
             update: { locationLat: lat, locationLng: lng },
             create: { userId, locationLat: lat, locationLng: lng },
           });
-         
+
           // Broadcast location update to relevant user
           const targetRole = role === "RIDER" ? "RIDER" : "USER";
           for (const [targetId, connection] of connections.entries()) {
