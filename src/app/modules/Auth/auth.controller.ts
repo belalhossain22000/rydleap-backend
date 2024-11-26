@@ -53,9 +53,7 @@ const getMyProfile = catchAsync(async (req: any, res: Response) => {
 
 // change password
 const changePassword = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user;
-
-  const result = await AuthServices.changePassword(user, req.body);
+  const result = await AuthServices.changePassword(req.body);
   sendResponse(res, {
     success: true,
     statusCode: 201,

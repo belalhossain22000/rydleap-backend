@@ -74,9 +74,9 @@ const getMyProfile = async (userId: string) => {
 };
 
 // change password for web
-const changePassword = async (user: any, payload: any) => {
+const changePassword = async (payload: any) => {
   const userData = await prisma.user.findUnique({
-    where: { id: user?.id },
+    where: { email: payload.email },
   });
 
   if (!userData) {
@@ -105,7 +105,12 @@ const changePassword = async (user: any, payload: any) => {
       password: hashedPassword,
     },
   });
-  return { message: "Password changed successfully" };
+
+  const firebaseUser = await admin.auth().getUserByEmail(payload.email);
+  await admin.auth().updateUser(firebaseUser.uid, {
+    password: payload.newPassword,
+  });
+  return;
 };
 
 // FORGOT PASSWORD
