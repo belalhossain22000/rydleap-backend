@@ -74,9 +74,9 @@ const getMyProfile = async (userId: string) => {
 };
 
 // change password
-const changePassword = async (payload: any) => {
+const changePassword = async (userId: string, payload: any) => {
   const userData = await prisma.user.findUnique({
-    where: { email: payload.email },
+    where: { id: userId },
   });
 
   if (!userData) {
@@ -106,7 +106,7 @@ const changePassword = async (payload: any) => {
     },
   });
 
-  const firebaseUser = await admin.auth().getUserByEmail(payload.email);
+  const firebaseUser = await admin.auth().getUserByEmail(userData.email);
   await admin.auth().updateUser(firebaseUser.uid, {
     password: payload.newPassword,
   });
