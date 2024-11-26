@@ -115,6 +115,16 @@ const forgotPassword = async (payload: { email: string }) => {
     },
   });
 
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otpExpiresAt = new Date();
+  otpExpiresAt.setMinutes(otpExpiresAt.getMinutes() + 5);
+  const otpExpiresAtString = otpExpiresAt.toISOString();
+
+  await prisma.user.update({
+    where: { email: payload.email },
+    data: { otp, otpExpiresAt: otpExpiresAtString },
+  });
+
   const resetPassToken = jwtHelpers.generateToken(
     { email: userData.email, role: userData.role },
     config.jwt.reset_pass_secret as Secret,
@@ -132,7 +142,7 @@ const forgotPassword = async (payload: { email: string }) => {
           <p>Dear ${userData.email},</p>
 
           <p>We received a request to reset your password. Click the button below to reset your password:</p>
-
+          <p>reset password using this OTP: ${otp}, This OTP is Expired in 5 minutes,</p>
           <a href="${resetPassLink}" style="text-decoration: none;">
             <button style="background-color: #007BFF; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
               Reset Password
@@ -193,19 +203,28 @@ const resetPassword = async (
 
 //reset password for app
 const resetPasswordFromAppIntoDB = async (payload: {
-  phoneNumber: string;
+  email: string;
+  otp: string;
   newPassword: string;
 }) => {
   const user = await prisma.user.findFirst({
-    where: { phoneNumber: payload.phoneNumber },
+    where: { email: payload.email },
   });
 
   if (!user) {
     throw new ApiError(404, "user not found");
   }
 
+  const currentTime = new Date(Date.now());
+
+  if (user?.otp !== payload.otp) {
+    throw new ApiError(404, "Your OTP is incorrect!");
+  } else if (!user.otpExpiresAt || user.otpExpiresAt <= currentTime) {
+    throw new ApiError(409, "Your OTP is expired, please send new otp");
+  }
+
   // hash password
-  const password = await bcrypt.hash(
+  const hashedPassword = await bcrypt.hash(
     payload.newPassword,
     Number(config.bcrypt_salt_rounds)
   );
@@ -215,7 +234,9 @@ const resetPasswordFromAppIntoDB = async (payload: {
       id: user.id,
     },
     data: {
-      password: password,
+      password: hashedPassword,
+      otp: null,
+      otpExpiresAt: null,
     },
   });
 

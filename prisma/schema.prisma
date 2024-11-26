@@ -33,6 +33,8 @@ model User {
   isAvailable            Boolean?           @default(true)
   totalBalance           Int                @default(0)
   cashout                Int                @default(0)
+  otp                    String?
+  otpExpiresAt           DateTime?
   createdAt              DateTime           @default(now())
   updatedAt              DateTime           @updatedAt
   riderVehicleInfo       RiderVehicleInfo?
@@ -62,6 +64,8 @@ model UserTransaction {
   status          PaymentStatus @default(PENDING)
   paymentMethod   String
   transactionType String        @default("Ride Fare")
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
   user            User          @relation(fields: [userId], references: [id])
   ride            Ride          @relation(fields: [rideId], references: [id])
 
@@ -69,25 +73,29 @@ model UserTransaction {
 }
 
 model PaymentInfo {
-  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
   cardNumber     Int
   cardHolderName String?
   cvv            Int
   expirationDate String
   country        String
-  userId         String  @db.ObjectId
+  userId         String   @db.ObjectId
   paymentMethod  String
-  user           User    @relation(fields: [userId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id])
 
   @@map("paymentInfo")
 }
 
 model PaymentMethod {
-  id               String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId           String  @db.ObjectId
-  paymentMethod    String  @unique
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String   @db.ObjectId
+  paymentMethod    String   @unique
   paymentMethodImg String?
-  user             User    @relation(fields: [userId], references: [id])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  user             User     @relation(fields: [userId], references: [id])
 
   @@map("paymentMethods")
 }
@@ -101,6 +109,8 @@ model RiderTransaction {
   orderId       String        @db.ObjectId
   status        PaymentStatus @default(PENDING)
   paymentMethod String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   rider         User          @relation(fields: [riderId], references: [id])
   ride          Ride          @relation(fields: [rideId], references: [id])
 
