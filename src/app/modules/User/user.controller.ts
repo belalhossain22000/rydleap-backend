@@ -22,11 +22,6 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 const createFirebaseUser = catchAsync(async (req: Request, res: Response) => {
   const user = await userService.createUserFirebase(req.body);
 
-  res.cookie("accessToken", user.accessToken, {
-    secure: false,
-    httpOnly: true,
-  });
-
   sendResponse(res, {
     statusCode: 201,
     success: true,

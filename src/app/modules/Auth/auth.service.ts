@@ -256,11 +256,6 @@ const updateFcpTokenIntoDB = async (req: any, res: any) => {
     const userData = { ...bodyData, fcpmToken: fcp, email: mail };
     const result = await userService.createUserFirebase(userData);
 
-    res.cookie("accessToken", result.accessToken, {
-      secure: false,
-      httpOnly: true,
-    });
-
     return result;
   }
 

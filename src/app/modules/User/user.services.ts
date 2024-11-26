@@ -78,22 +78,46 @@ const createUserFirebase = async (payload: any) => {
     );
   }
 
-  const createdUser = await prisma.user.create({
-    data: payload,
-  });
+  if (payload.password) {
+    const hashedPassword = await bcrypt.hash(
+      payload.password,
+      Number(config.bcrypt_salt_rounds)
+    );
+    const createUser = await prisma.user.create({
+      data: {
+        ...payload,
+        password: hashedPassword,
+      },
+    });
 
-  const accessToken = jwtHelpers.generateToken(
-    {
-      id: createdUser.id,
-      email: createdUser.email,
-      role: createdUser.role,
-    },
-    config.jwt.jwt_secret as Secret,
-    config.jwt.expires_in as string
-  );
+    const accessToken = jwtHelpers.generateToken(
+      {
+        id: createUser.id,
+        email: createUser.email,
+        role: createUser.role,
+      },
+      config.jwt.jwt_secret as Secret,
+      config.jwt.expires_in as string
+    );
+    return accessToken;
+  } else {
+    const createdUserWithoutPassword = await prisma.user.create({
+      data: {
+        ...payload,
+      },
+    });
+    const accessToken = jwtHelpers.generateToken(
+      {
+        id: createdUserWithoutPassword.id,
+        email: createdUserWithoutPassword.email,
+        role: createdUserWithoutPassword.role,
+      },
+      config.jwt.jwt_secret as Secret,
+      config.jwt.expires_in as string
+    );
 
-  const result = { accessToken };
-  return result;
+    return accessToken;
+  }
 };
 
 // social login
