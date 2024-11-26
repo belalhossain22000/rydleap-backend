@@ -241,57 +241,10 @@ const resetPasswordFromAppIntoDB = async (payload: {
     },
   });
 
-  //reset password for app
-  const resetPasswordFromAppIntoDB = async (payload: {
-    email: string;
-    otp: string;
-    newPassword: string;
-  }) => {
-    const user = await prisma.user.findFirst({
-      where: { email: payload.email },
-    });
-
-    if (!user) {
-      throw new ApiError(404, "user not found");
-    }
-
-    const currentTime = new Date(Date.now());
-
-    if (user?.otp !== payload.otp) {
-      throw new ApiError(404, "Your OTP is incorrect!");
-    } else if (!user.otpExpiresAt || user.otpExpiresAt <= currentTime) {
-      throw new ApiError(409, "Your OTP is expired, please send new otp");
-    }
-
-    // hash password
-    const hashedPassword = await bcrypt.hash(
-      payload.newPassword,
-      Number(config.bcrypt_salt_rounds)
-    );
-
-    await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        password: hashedPassword,
-        otp: null,
-        otpExpiresAt: null,
-      },
-    });
-
-    try {
-      const firebaseUser = await admin.auth().getUserByEmail(payload.email);
-      await admin.auth().updateUser(firebaseUser.uid, {
-        password: "newSecurePassword123",
-      });
-      console.log("Password updated successfully in Firebase");
-    } catch (error) {
-      console.error("Error updating password:", error);
-    }
-
-    return user;
-  };
+  const firebaseUser = await admin.auth().getUserByEmail(payload.email);
+  await admin.auth().updateUser(firebaseUser.uid, {
+    password: payload.newPassword, // Ensure this is a valid string
+  });
 
   return user;
 };
