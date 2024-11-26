@@ -165,6 +165,26 @@ const forgotPassword = async (payload: { email: string }) => {
   return result;
 };
 
+// verify otp
+const verifyOtpInDB = async (bodyData: { email: string; otp: string }) => {
+  const userData = await prisma.user.findUnique({
+    where: { email: bodyData.email },
+  });
+
+  if (!userData) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+  }
+  const currentTime = new Date(Date.now());
+
+  if (userData?.otp !== bodyData.otp) {
+    throw new ApiError(404, "Your OTP is incorrect!");
+  } else if (!userData.otpExpiresAt || userData.otpExpiresAt <= currentTime) {
+    throw new ApiError(409, "Your OTP is expired, please send new otp");
+  }
+
+  return;
+};
+
 // reset password
 const resetPassword = async (
   token: string,
@@ -210,7 +230,6 @@ const resetPassword = async (
 //reset password for app
 const resetPasswordFromAppIntoDB = async (payload: {
   email: string;
-  otp: string;
   newPassword: string;
 }) => {
   const user = await prisma.user.findFirst({
@@ -219,14 +238,6 @@ const resetPasswordFromAppIntoDB = async (payload: {
 
   if (!user) {
     throw new ApiError(404, "user not found");
-  }
-
-  const currentTime = new Date(Date.now());
-
-  if (user?.otp !== payload.otp) {
-    throw new ApiError(404, "Your OTP is incorrect!");
-  } else if (!user.otpExpiresAt || user.otpExpiresAt <= currentTime) {
-    throw new ApiError(409, "Your OTP is expired, please send new otp");
   }
 
   // hash password
@@ -302,6 +313,7 @@ export const AuthServices = {
   getMyProfile,
   changePassword,
   forgotPassword,
+  verifyOtpInDB,
   resetPassword,
   resetPasswordFromAppIntoDB,
   updateFcpTokenIntoDB,

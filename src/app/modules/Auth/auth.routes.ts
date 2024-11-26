@@ -31,6 +31,8 @@ router.put(
 
 router.post("/forgot-password", AuthController.forgotPassword);
 
+router.put("/verify-otp", AuthController.verifyOtp);
+
 router.post("/reset-password", AuthController.resetPassword);
 router.patch("/reset-password-app", AuthController.resetPasswordFromApp);
 

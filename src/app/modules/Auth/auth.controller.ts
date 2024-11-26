@@ -74,6 +74,19 @@ const forgotPassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//verify otp
+
+const verifyOtp = catchAsync(async (req: Request, res: Response) => {
+  const result = await AuthServices.verifyOtpInDB(req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "OTP verified successfully. Proceed to reset password.",
+    data: result,
+  });
+});
+
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
   const token = req.headers.authorization || "";
 
@@ -115,6 +128,7 @@ export const AuthController = {
   getMyProfile,
   changePassword,
   forgotPassword,
+  verifyOtp,
   resetPassword,
   resetPasswordFromApp,
   updateFcpToken,
