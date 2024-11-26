@@ -12,7 +12,7 @@ async function main() {
   });
 
   // Initialize WebSocket server
-  const wss = new WebSocketServer({ server });
+  const wss = new WebSocketServer({ server, path: "/ws" });
 
   // Store active WebSocket connections
   const connections: Map<string, { ws: WebSocket; role: "RIDER" | "USER" }> =
@@ -42,13 +42,7 @@ async function main() {
             update: { locationLat: lat, locationLng: lng },
             create: { userId, locationLat: lat, locationLng: lng },
           });
-          // ws.send(
-          //   JSON.stringify({
-          //     type: "location-update",
-          //     userId,
-          //     location: { lat, lng },
-          //   })
-          // );
+         
           // Broadcast location update to relevant user
           const targetRole = role === "RIDER" ? "RIDER" : "USER";
           for (const [targetId, connection] of connections.entries()) {
