@@ -221,11 +221,16 @@ const getAllRideRequestsFromDb = async () => {
     },
   });
 
-  if (rides.length === 0) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No Ride Request Found");
-  }
+  const totalAcceptedBookings = await prisma.ride.count({
+    where: {
+      status: "ACCEPTED",
+    },
+  });
 
-  return rides;
+  return {
+    rides,
+    totalAcceptedBookings,
+  };
 };
 
 // update ride status
@@ -277,13 +282,6 @@ const getRideHistoryByRiderId = async (riderId: string) => {
       },
     },
   });
-
-  if (rides.length === 0) {
-    throw new ApiError(
-      httpStatus.NOT_FOUND,
-      "No ride history found for this rider"
-    );
-  }
   return rides;
 };
 
@@ -301,13 +299,6 @@ const getRideHistoryByUserId = async (userId: string) => {
       },
     },
   });
-
-  if (rides.length === 0) {
-    throw new ApiError(
-      httpStatus.NOT_FOUND,
-      "No user history found for this rider"
-    );
-  }
   return rides;
 };
 

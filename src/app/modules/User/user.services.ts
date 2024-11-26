@@ -243,6 +243,13 @@ const getUsersFromDb = async (
     },
   });
 
+  const totalActiveUsers = await prisma.user.count({
+    where: {
+      role: "USER",
+      status: "ACTIVE",
+    },
+  });
+
   const total = await prisma.user.count({
     where: {
       ...whereConditions,
@@ -254,6 +261,7 @@ const getUsersFromDb = async (
       page,
       limit,
       total,
+      totalActiveUsers,
     },
     data: result,
   };
@@ -337,6 +345,13 @@ const getRidersFromDb = async (
     },
   });
 
+  const totalActiveDrivers = await prisma.user.count({
+    where: {
+      role: "RIDER",
+      status: "ACTIVE",
+    },
+  });
+
   const total = await prisma.user.count({
     where: {
       ...whereConditions,
@@ -348,6 +363,7 @@ const getRidersFromDb = async (
       page,
       limit,
       total,
+      totalActiveDrivers,
     },
     data: result,
   };

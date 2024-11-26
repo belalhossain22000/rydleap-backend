@@ -103,7 +103,15 @@ const createTransactionIntoDB = async (payload: TTransactionPayload) => {
 
 const getUserTransactionsFromDB = async () => {
   const result = await prisma.userTransaction.findMany();
-  return result;
+
+  const totalRevenue = result.reduce(
+    (sum, transaction) => sum + transaction.amount,
+    0
+  );
+  return {
+    result,
+    totalRevenue,
+  };
 };
 
 export const transactionService = {
