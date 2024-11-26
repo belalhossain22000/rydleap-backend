@@ -73,7 +73,7 @@ const getMyProfile = async (userId: string) => {
   return sanitizedUser;
 };
 
-// change password
+// change password for web
 const changePassword = async (user: any, payload: any) => {
   const userData = await prisma.user.findUnique({
     where: { id: user?.id },
