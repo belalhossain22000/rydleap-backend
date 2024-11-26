@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start:prod": "node ./dist/server.js",
+    "start": "node ./dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
@@ -26,6 +26,7 @@
     "@types/passport-apple": "^2.0.3",
     "@types/passport-facebook": "^3.0.3",
     "@types/passport-google-oauth20": "^2.0.16",
+    "@types/ws": "^8.5.12",
     "prisma": "^5.19.1",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
@@ -57,6 +58,7 @@
     "socket.io": "^4.7.5",
     "stripe": "^16.8.0",
     "twilio": "^5.3.0",
+    "ws": "^8.18.0",
     "zod": "^3.23.8"
   }
 }

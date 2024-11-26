@@ -11,10 +11,10 @@ import bodyParser from "body-parser";
 const app: Application = express();
 export const corsOptions = {
   origin: [
-    "http://localhost:3001",
-    "http://localhost:3000",
     "https://rydleap-dashboard.vercel.app",
     "https://rydleap-web.vercel.app",
+    "https://admin-peace-unity.code-commando.com",
+    "https://peace-unity.code-commando.com"
   ],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],

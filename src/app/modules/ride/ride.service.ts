@@ -20,7 +20,7 @@ const createRideRequest = async (payload: any, user: any) => {
       userId: user.id,
       status: {
         not: {
-          in: ["COMPLETED", "CANCELLED"],
+          in: ["COMPLETED", "CANCELLED",],
         },
       },
     },
@@ -39,6 +39,7 @@ const createRideRequest = async (payload: any, user: any) => {
   const riders = await prisma.user.findMany({
     where: {
       role: "RIDER",
+      // isOnline: true,
       status: "ACTIVE",
       isAvailable: true,
     },
@@ -117,7 +118,7 @@ const createRideRequest = async (payload: any, user: any) => {
     // Update the ride request with the assigned rider
     const updatedRide = await prisma.ride.update({
       where: { id: ride.id },
-      data: { riderId: nearestRider.id, status: "PENDING" },
+      data: { riderId: nearestRider.id, status: "ACCEPTED" },
     });
 
     return {
@@ -137,9 +138,17 @@ const getRideRequestsByRiderId = async (riderId: string) => {
       status: "PENDING",
     },
     include: {
-      user: true,
-      rider: true,
-      package: true,
+      user: {
+        include: {
+          locations: true,
+        },
+      },
+      rider: {
+        include: {
+          locations: true,
+        },
+      },
+      // package: true,
     },
   });
 
@@ -157,8 +166,16 @@ const getRideRequestsByUserId = async (riderId: string) => {
       status: "PENDING",
     },
     include: {
-      user: true,
-      rider: true,
+      user: {
+        include: {
+          locations: true,
+        },
+      },
+      rider: {
+        include: {
+          locations: true,
+        },
+      },
       package: true,
     },
   });
@@ -182,6 +199,9 @@ const getRideRequestByRideId = async (rideId: string) => {
           email: true,
           phoneNumber: true,
           riderReviewsAsCustomer: true,
+        },
+        include: {
+          locations: true,
         },
       },
     },

@@ -15,6 +15,7 @@ model OTP {
   expiry      DateTime
 }
 
+// User model
 model User {
   id                     String             @id @default(auto()) @map("_id") @db.ObjectId
   fullName               String
