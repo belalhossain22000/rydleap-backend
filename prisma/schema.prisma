@@ -31,6 +31,8 @@ model User {
   isOnline               Boolean?           @default(false)
   isDeleted              Boolean            @default(false)
   isAvailable            Boolean?           @default(true)
+  totalBalance           Int                @default(0)
+  cashout                Int                @default(0)
   createdAt              DateTime           @default(now())
   updatedAt              DateTime           @updatedAt
   riderVehicleInfo       RiderVehicleInfo?
