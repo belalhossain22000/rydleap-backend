@@ -49,6 +49,7 @@ model User {
   paymentInfo            PaymentInfo[]
   paymentMethod          PaymentMethod[]
   notifications          Notifications[]
+  riderPayout            RiderPayout[]
 
   @@map("Users")
 }
@@ -243,6 +244,19 @@ model Notifications {
   user       User     @relation(fields: [receiverId], references: [id])
 }
 
+model RiderPayout {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  riderId       String       @db.ObjectId
+  amount        Int
+  paymentMethod String
+  status        PayoutStatus @default(PROCESSED)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  user          User         @relation(fields: [riderId], references: [id])
+
+  @@map("riderPayouts")
+}
+
 enum UserRole {
   ADMIN
   RIDER
@@ -271,4 +285,9 @@ enum RideStatus {
 enum PaymentStatus {
   COMPLETED
   PENDING
+}
+
+enum PayoutStatus {
+  COMPLETED
+  PROCESSED
 }

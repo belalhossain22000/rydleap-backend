@@ -15,5 +15,22 @@ router.get(
   auth(UserRole.ADMIN),
   transactionController.getUserTransactions
 );
+router.get(
+  "/:transactionId",
+  auth(UserRole.ADMIN),
+  transactionController.getTransactionById
+);
+
+router.post(
+  "/payout",
+  auth(UserRole.RIDER),
+  transactionController.createPayout
+);
+
+router.get(
+  "/payout/all",
+  auth(UserRole.ADMIN),
+  transactionController.getPayouts
+);
 
 export const transactionRoutes = router;

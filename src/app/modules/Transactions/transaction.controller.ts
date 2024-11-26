@@ -30,7 +30,50 @@ const getUserTransactions = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getTransactionById = catchAsync(async (req: Request, res: Response) => {
+  const result = await transactionService.getSingleTransactionFromDB(
+    req.params.transactionId
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Transaction retrieved successfully",
+    data: result,
+  });
+});
+
+const createPayout = catchAsync(async (req: any, res: Response) => {
+  const riderId = req.user.id;
+  const transactionData = req.body;
+  const result = await transactionService.createPayoutInDB(
+    transactionData,
+    riderId
+  );
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: "Payout created successfully created",
+    data: result,
+  });
+});
+
+const getPayouts = catchAsync(async (req: Request, res: Response) => {
+  const result = await transactionService.getAllPayouts();
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Payouts retrieved successfully",
+    data: result,
+  });
+});
+
 export const transactionController = {
   createTransaction,
   getUserTransactions,
+  getTransactionById,
+  createPayout,
+  getPayouts,
 };

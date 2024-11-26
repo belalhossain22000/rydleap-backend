@@ -1,4 +1,5 @@
 import prisma from "../../../shared/prisma";
+import ApiError from "../../errors/ApiErrors";
 
 // const paypalPaymentToOwner = catchAsync(async (req: any, res: any) => {
 //   const result: any = await paymentService.sendPaymentToOwner(req);
@@ -102,7 +103,19 @@ const createTransactionIntoDB = async (payload: TTransactionPayload) => {
 };
 
 const getUserTransactionsFromDB = async () => {
-  const result = await prisma.userTransaction.findMany();
+  const result = await prisma.userTransaction.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          fullName: true,
+        },
+      },
+    },
+  });
 
   const totalRevenue = result.reduce(
     (sum, transaction) => sum + transaction.amount,
@@ -114,7 +127,52 @@ const getUserTransactionsFromDB = async () => {
   };
 };
 
+const getSingleTransactionFromDB = async (transactionId: string) => {
+  const result = await prisma.userTransaction.findUnique({
+    where: { id: transactionId },
+    include: {
+      user: {
+        select: {
+          id: true,
+          fullName: true,
+        },
+      },
+    },
+  });
+  return result;
+};
+
+const createPayoutInDB = async (payload: any, riderId: string) => {
+  const rider = await prisma.user.findUnique({ where: { id: riderId } });
+  if (!rider) {
+    throw new ApiError(404, "Rider not found or not a valid rider");
+  }
+  const result = await prisma.riderPayout.create({
+    data: payload,
+  });
+
+  await prisma.user.update({
+    where: { id: riderId },
+    data: {
+      totalBalance: {
+        decrement: payload.amount,
+      },
+    },
+  });
+
+  return result;
+};
+
+const getAllPayouts = async () => {
+  console.log("first");
+  const result = await prisma.riderPayout.findMany();
+  return result;
+};
+
 export const transactionService = {
   createTransactionIntoDB,
   getUserTransactionsFromDB,
+  getSingleTransactionFromDB,
+  createPayoutInDB,
+  getAllPayouts,
 };

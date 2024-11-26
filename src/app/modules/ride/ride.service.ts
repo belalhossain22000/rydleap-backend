@@ -221,15 +221,29 @@ const getAllRideRequestsFromDb = async () => {
     },
   });
 
-  const totalAcceptedBookings = await prisma.ride.count({
+  const ongoingRides = await prisma.ride.count({
     where: {
       status: "ACCEPTED",
+    },
+  });
+  const completedRides = await prisma.ride.count({
+    where: {
+      status: "COMPLETED",
+    },
+  });
+
+  const canceledRides = await prisma.ride.count({
+    where: {
+      status: "CANCELLED",
     },
   });
 
   return {
     rides,
-    totalAcceptedBookings,
+    totalRides: rides.length,
+    ongoingRides,
+    completedRides,
+    canceledRides,
   };
 };
 
