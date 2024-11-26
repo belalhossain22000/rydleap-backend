@@ -164,8 +164,18 @@ const createPayoutInDB = async (payload: any, riderId: string) => {
 };
 
 const getAllPayouts = async () => {
-  console.log("first");
   const result = await prisma.riderPayout.findMany();
+  return result;
+};
+
+const getSinglePayout = async (payoutId: string) => {
+  const result = await prisma.riderPayout.findUnique({
+    where: { id: payoutId },
+  });
+
+  if (!result) {
+    throw new ApiError(404, "Payout not found");
+  }
   return result;
 };
 
@@ -175,4 +185,5 @@ export const transactionService = {
   getSingleTransactionFromDB,
   createPayoutInDB,
   getAllPayouts,
+  getSinglePayout,
 };

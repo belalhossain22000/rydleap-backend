@@ -33,4 +33,10 @@ router.get(
   transactionController.getPayouts
 );
 
+router.get(
+  "/payout/:payoutId",
+  auth(UserRole.ADMIN),
+  transactionController.getPayout
+);
+
 export const transactionRoutes = router;

@@ -70,10 +70,22 @@ const getPayouts = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getPayout = catchAsync(async (req: Request, res: Response) => {
+  const result = await transactionService.getSinglePayout(req.params.payoutId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Payout retrieved successfully retrieved",
+    data: result,
+  });
+});
+
 export const transactionController = {
   createTransaction,
   getUserTransactions,
   getTransactionById,
   createPayout,
   getPayouts,
+  getPayout,
 };
