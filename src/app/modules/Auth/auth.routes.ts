@@ -24,7 +24,7 @@ router.get("/get-me", auth(), AuthController.getMyProfile);
 
 router.put(
   "/change-password",
-  auth(UserRole.ADMIN, UserRole.USER),
+  auth(),
   validateRequest(authValidation.changePasswordValidationSchema),
   AuthController.changePassword
 );

@@ -52,4 +52,6 @@ router.get(
   RiderRequestController.getRideRequest
 );
 
+router.get("/:rideId", auth(), RiderRequestController.getSingleRideHistory);
+
 export const rideRoute = router;

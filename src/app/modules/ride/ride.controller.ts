@@ -100,6 +100,21 @@ const updateRideRequestByRideId = catchAsync(
   }
 );
 
+const getSingleRideHistory = catchAsync(async (req: any, res: Response) => {
+  const rideId = req.params.rideId;
+  const userId = req.user.id;
+  const result = await RideRequestService.getSingleRideHistoryFromDB(
+    rideId,
+    userId
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Single ride history retrieved successfully",
+    data: result,
+  });
+});
+
 export const RiderRequestController = {
   createRideRequest,
   getRiderByRiderId,
@@ -109,4 +124,5 @@ export const RiderRequestController = {
   getRideHistoryByRiderId,
   getRideHistoryByUserId,
   getRideRequest,
+  getSingleRideHistory,
 };

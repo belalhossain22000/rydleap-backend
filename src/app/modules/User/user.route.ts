@@ -37,16 +37,12 @@ router.get("/single-rider/:riderId", auth(), userController.getRiderById);
 // *!profile user
 router.put(
   "/profile",
-  auth(UserRole.ADMIN, UserRole.USER),
+  auth(),
   fileUploader.uploadprofileImage,
   userController.updateProfile
 );
 
 // *!update  user
-router.put(
-  "/:id",
-  // auth(UserRole.ADMIN),
-  userController.updateUser
-);
+router.put("/:id", auth(UserRole.ADMIN), userController.updateUser);
 
 export const userRoutes = router;

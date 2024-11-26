@@ -20,7 +20,7 @@ const createRideRequest = async (payload: any, user: any) => {
       userId: user.id,
       status: {
         not: {
-          in: ["COMPLETED", "CANCELLED",],
+          in: ["COMPLETED", "CANCELLED"],
         },
       },
     },
@@ -263,7 +263,7 @@ const updateRideStatusByRideId = async (req: any, rideId: string) => {
   return updatedRide;
 };
 
-// get ride history from ride table
+// get ride history by rider id
 const getRideHistoryByRiderId = async (riderId: string) => {
   const rides = await prisma.ride.findMany({
     where: {
@@ -311,6 +311,40 @@ const getRideHistoryByUserId = async (userId: string) => {
   return rides;
 };
 
+const getSingleRideHistoryFromDB = async (rideId: string, userId: string) => {
+  const ride = await prisma.ride.findUnique({
+    where: {
+      id: rideId,
+      userId: userId,
+      riderId: userId,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          phoneNumber: true,
+          profileImage: true,
+          role: true,
+        },
+      },
+      rider: {
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          phoneNumber: true,
+          profileImage: true,
+          role: true,
+        },
+      },
+    },
+  });
+
+  return ride;
+};
+
 export const RideRequestService = {
   createRideRequest,
   getRideRequestsByRiderId,
@@ -320,4 +354,5 @@ export const RideRequestService = {
   getRideHistoryByRiderId,
   getRideHistoryByUserId,
   getRideRequestByRideId,
+  getSingleRideHistoryFromDB,
 };
