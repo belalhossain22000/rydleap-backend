@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { transactionService } from "./transaction.service";
+import ApiError from "../../errors/ApiErrors";
 
 const createTransaction = catchAsync(async (req: Request, res: Response) => {
   const transactionData = req.body;
@@ -20,12 +21,26 @@ const createTransaction = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getUserTransactions = catchAsync(async (req: Request, res: Response) => {
-  const result = await transactionService.getUserTransactionsFromDB();
+  const { filter } = req.query;
+
+  // Validate the filter
+  const validFilters = ["weekly", "monthly", "yearly"];
+  if (filter && !validFilters.includes(filter as string)) {
+    throw new ApiError(
+      400,
+      "Invalid filter. Use 'weekly', 'monthly', or 'yearly'."
+    );
+  }
+
+  // Call the service and pass the filter
+  const result = await transactionService.getUserTransactionsFromDB(
+    filter as "weekly" | "monthly" | "yearly"
+  );
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "user transaction retrieved successfully",
+    message: "transactions retrieved successfully",
     data: result,
   });
 });
@@ -60,7 +75,19 @@ const createPayout = catchAsync(async (req: any, res: Response) => {
 });
 
 const getPayouts = catchAsync(async (req: Request, res: Response) => {
-  const result = await transactionService.getAllPayouts();
+  const { filter } = req.query;
+
+  // Validate the filter
+  const validFilters = ["weekly", "monthly", "yearly"];
+  if (filter && !validFilters.includes(filter as string)) {
+    throw new ApiError(
+      400,
+      "Invalid filter. Use 'weekly', 'monthly', or 'yearly'."
+    );
+  }
+  const result = await transactionService.getAllPayouts(
+    filter as "weekly" | "monthly" | "yearly"
+  );
 
   sendResponse(res, {
     statusCode: 200,

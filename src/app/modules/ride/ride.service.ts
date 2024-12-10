@@ -1,6 +1,7 @@
 import httpStatus from "http-status";
 import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiErrors";
+import { generateDateFilter } from "../../../helpars/generateDateFilter";
 
 // Todo need to change payload interface and user interfacce
 const createRideRequest = async (payload: any, user: any) => {
@@ -214,28 +215,54 @@ const getRideRequestByRideId = async (rideId: string) => {
   return ride;
 };
 
-const getAllRideRequestsFromDb = async () => {
+const getAllRideRequestsFromDb = async (
+  filter?: "weekly" | "monthly" | "yearly"
+) => {
+  const dateFilter = generateDateFilter(filter);
   const rides = await prisma.ride.findMany({
+    where: dateFilter
+      ? {
+          createdAt: {
+            gte: dateFilter,
+          },
+        }
+      : undefined,
+
     orderBy: {
       createdAt: "desc",
     },
   });
 
   const ongoingRides = await prisma.ride.count({
-    where: {
-      status: "ACCEPTED",
-    },
+    where: dateFilter
+      ? {
+          createdAt: {
+            gte: dateFilter, // Filter transactions greater than or equal to the date
+          },
+          status: "ACCEPTED",
+        }
+      : { status: "ACCEPTED" },
   });
   const completedRides = await prisma.ride.count({
-    where: {
-      status: "COMPLETED",
-    },
+    where: dateFilter
+      ? {
+          createdAt: {
+            gte: dateFilter, // Filter transactions greater than or equal to the date
+          },
+          status: "COMPLETED",
+        }
+      : { status: "COMPLETED" },
   });
 
   const canceledRides = await prisma.ride.count({
-    where: {
-      status: "CANCELLED",
-    },
+    where: dateFilter
+      ? {
+          createdAt: {
+            gte: dateFilter, // Filter transactions greater than or equal to the date
+          },
+          status: "CANCELLED",
+        }
+      : { status: "CANCELLED" },
   });
 
   return {

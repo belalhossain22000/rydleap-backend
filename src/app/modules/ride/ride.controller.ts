@@ -3,6 +3,7 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import { RideRequestService } from "./ride.service";
+import ApiError from "../../errors/ApiErrors";
 
 const createRideRequest = catchAsync(async (req: Request, res: Response) => {
   const result = await RideRequestService.createRideRequest(req.body, req.user);
@@ -63,7 +64,20 @@ const getRideHistoryByRiderId = catchAsync(
 );
 
 const getRideRequests = catchAsync(async (req: Request, res: Response) => {
-  const result = await RideRequestService.getAllRideRequestsFromDb();
+  const { filter } = req.query;
+
+  // Validate the filter
+  const validFilters = ["weekly", "monthly", "yearly"];
+  if (filter && !validFilters.includes(filter as string)) {
+    throw new ApiError(
+      400,
+      "Invalid filter. Use 'weekly', 'monthly', or 'yearly'."
+    );
+  }
+
+  const result = await RideRequestService.getAllRideRequestsFromDb(
+    filter as "weekly" | "monthly" | "yearly"
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

@@ -5,11 +5,7 @@ import httpStatus from "http-status";
 import { packageService } from "./package.service";
 
 const createPackage = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user as any;
-  const payload = {
-    ...req.body,
-    userId: user?.id,
-  };
+  const payload = req.body;
   const result = await packageService.createPackageIntoDb(payload);
 
   sendResponse(res, {
@@ -61,7 +57,7 @@ const deletePackage = catchAsync(async (req: Request, res: Response) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "Package deleted successfully",
-    data: null
+    data: null,
   });
 });
 

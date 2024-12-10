@@ -15,13 +15,7 @@ const createPackageIntoDb = async (payload: Package) => {
   const result = await prisma.package.create({
     data: payload,
   });
-  
-  if (!result) {
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      "Package Created failed"
-    );
-  }
+
   return result;
 };
 
@@ -33,7 +27,6 @@ const getAllPackagesIntoDb = async () => {
 
 //get package by id
 const getPackageByIdIntoDb = async (id: string) => {
-  
   const packageById = await prisma.package.findUnique({
     where: { id },
   });

@@ -1,3 +1,4 @@
+import { generateDateFilter } from "../../../helpars/generateDateFilter";
 import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiErrors";
 
@@ -102,8 +103,20 @@ const createTransactionIntoDB = async (payload: TTransactionPayload) => {
   }
 };
 
-const getUserTransactionsFromDB = async () => {
+const getUserTransactionsFromDB = async (
+  filter?: "weekly" | "monthly" | "yearly"
+) => {
+  const dateFilter = generateDateFilter(filter);
   const result = await prisma.userTransaction.findMany({
+    where: dateFilter
+      ? {
+          createdAt: {
+            gte: dateFilter, // Filter transactions greater than or equal to the date
+          },
+          status: "COMPLETED",
+        }
+      : { status: "COMPLETED" },
+
     orderBy: {
       createdAt: "desc",
     },
@@ -163,8 +176,21 @@ const createPayoutInDB = async (payload: any, riderId: string) => {
   return result;
 };
 
-const getAllPayouts = async () => {
-  const result = await prisma.riderPayout.findMany();
+const getAllPayouts = async (filter?: "weekly" | "monthly" | "yearly") => {
+  const dateFilter = generateDateFilter(filter);
+  const result = await prisma.riderPayout.findMany({
+    where: dateFilter
+      ? {
+          createdAt: {
+            gte: dateFilter,
+          },
+        }
+      : undefined,
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
   return result;
 };
 
