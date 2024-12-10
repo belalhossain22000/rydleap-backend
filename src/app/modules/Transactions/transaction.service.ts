@@ -206,6 +206,7 @@ const getAllPayouts = async (filter?: "weekly" | "monthly" | "yearly") => {
     orderBy: {
       createdAt: "desc",
     },
+    include: { user: { select: { fullName: true } } },
   });
   return result;
 };
@@ -213,6 +214,7 @@ const getAllPayouts = async (filter?: "weekly" | "monthly" | "yearly") => {
 const getSinglePayout = async (payoutId: string) => {
   const result = await prisma.riderPayout.findUnique({
     where: { id: payoutId },
+    include: { user: { select: { fullName: true } } },
   });
 
   if (!result) {
