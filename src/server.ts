@@ -12,7 +12,7 @@ async function main() {
   });
 
   // Initialize WebSocket server
-  const wss = new WebSocketServer({ server, path: '/ws/' });
+  const wss = new WebSocketServer({ server });
 
   // Store active WebSocket connections
   const connections: Map<string, { ws: WebSocket; role: "RIDER" | "USER" }> =
