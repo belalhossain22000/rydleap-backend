@@ -172,6 +172,10 @@ const createPayoutInDB = async (payload: any, riderId: string) => {
   if (!rider) {
     throw new ApiError(404, "Rider not found or not a valid rider");
   }
+
+  if (rider.totalBalance < payload.amount) {
+    throw new ApiError(400, "Insufficient balance");
+  }
   const result = await prisma.riderPayout.create({
     data: payload,
   });
