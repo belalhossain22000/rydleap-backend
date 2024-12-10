@@ -45,4 +45,10 @@ router.get(
   transactionController.getDriverPayouts
 );
 
+router.get(
+  "/dashboard/overview",
+  auth(UserRole.ADMIN),
+  transactionController.getOverViewData
+);
+
 export const transactionRoutes = router;

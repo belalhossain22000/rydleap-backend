@@ -120,6 +120,31 @@ const getDriverPayouts = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getOverViewData = catchAsync(async (req: Request, res: Response) => {
+  const { filter } = req.query;
+
+  // Validate the filter
+  const validFilters = ["weekly", "monthly", "yearly"];
+  if (filter && !validFilters.includes(filter as string)) {
+    throw new ApiError(
+      400,
+      "Invalid filter. Use 'weekly', 'monthly', or 'yearly'."
+    );
+  }
+
+  // Call the service and pass the filter
+  const result = await transactionService.overviewDataFromDB(
+    filter as "weekly" | "monthly" | "yearly"
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "overview data retrieved successfully",
+    data: result,
+  });
+});
+
 export const transactionController = {
   createTransaction,
   getUserTransactions,
@@ -128,4 +153,5 @@ export const transactionController = {
   getPayouts,
   getPayout,
   getDriverPayouts,
+  getOverViewData,
 };

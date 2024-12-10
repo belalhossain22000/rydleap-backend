@@ -134,9 +134,21 @@ const getUserTransactionsFromDB = async (
     (sum, transaction) => sum + transaction.amount,
     0
   );
+  const bookings = await prisma.ride.findMany({
+    where: dateFilter
+      ? {
+          createdAt: {
+            gte: dateFilter, // Filter transactions greater than or equal to the date
+          },
+        }
+      : undefined,
+  });
+  const totalBookings = bookings.length;
+
   return {
     result,
     totalRevenue,
+    totalBookings,
   };
 };
 
@@ -220,6 +232,68 @@ const getPayoutsForDriverFromDB = async (riderId: string) => {
   return totalAmount;
 };
 
+const overviewDataFromDB = async (filter?: "weekly" | "monthly" | "yearly") => {
+  const dateFilter = generateDateFilter(filter);
+  const result = await prisma.userTransaction.findMany({
+    where: dateFilter
+      ? {
+          createdAt: {
+            gte: dateFilter, // Filter transactions greater than or equal to the date
+          },
+          status: "COMPLETED",
+        }
+      : { status: "COMPLETED" },
+  });
+
+  const totalRevenue = result.reduce(
+    (sum, transaction) => sum + transaction.amount,
+    0
+  );
+  const bookings = await prisma.ride.findMany({
+    where: dateFilter
+      ? {
+          createdAt: {
+            gte: dateFilter,
+          },
+        }
+      : undefined,
+  });
+  const totalBookings = bookings.length;
+
+  const drivers = await prisma.user.findMany({
+    where: { role: "RIDER", status: "ACTIVE" },
+  });
+  const activeDrivers = drivers.length;
+  const totalDrivers = await prisma.user.findMany({
+    where: dateFilter
+      ? {
+          createdAt: {
+            gte: dateFilter, // Filter transactions greater than or equal to the date
+          },
+          role: "RIDER",
+        }
+      : { role: "RIDER" },
+  });
+  const totalUsers = await prisma.user.findMany({
+    where: dateFilter
+      ? {
+          createdAt: {
+            gte: dateFilter, // Filter transactions greater than or equal to the date
+          },
+          role: "USER",
+        }
+      : { role: "USER" },
+  });
+
+  return {
+    totalRevenue,
+    totalBookings,
+    activeDrivers,
+    totalDrivers: totalDrivers.length,
+    totalUsers: totalUsers.length,
+  };
+};
+
 export const transactionService = {
   createTransactionIntoDB,
   getUserTransactionsFromDB,
@@ -228,4 +302,5 @@ export const transactionService = {
   getAllPayouts,
   getSinglePayout,
   getPayoutsForDriverFromDB,
+  overviewDataFromDB,
 };
