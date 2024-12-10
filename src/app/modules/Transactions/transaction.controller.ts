@@ -81,6 +81,18 @@ const getPayout = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getDriverPayouts = catchAsync(async (req: Request, res: Response) => {
+  const driverId = req.params.driverId;
+  const result = await transactionService.getPayoutsForDriverFromDB(driverId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "driver payout amount retrived successfully",
+    data: result,
+  });
+});
+
 export const transactionController = {
   createTransaction,
   getUserTransactions,
@@ -88,4 +100,5 @@ export const transactionController = {
   createPayout,
   getPayouts,
   getPayout,
+  getDriverPayouts,
 };

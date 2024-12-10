@@ -179,6 +179,21 @@ const getSinglePayout = async (payoutId: string) => {
   return result;
 };
 
+const getPayoutsForDriverFromDB = async (riderId: string) => {
+  const results = await prisma.riderPayout.findMany({
+    where: { riderId: riderId },
+  });
+
+  if (results.length === 0) {
+    throw new ApiError(404, "No payouts found for this driver");
+  }
+
+  // Calculate the total amount
+  const totalAmount = results.reduce((sum, payout) => sum + payout.amount, 0);
+
+  return totalAmount;
+};
+
 export const transactionService = {
   createTransactionIntoDB,
   getUserTransactionsFromDB,
@@ -186,4 +201,5 @@ export const transactionService = {
   createPayoutInDB,
   getAllPayouts,
   getSinglePayout,
+  getPayoutsForDriverFromDB,
 };

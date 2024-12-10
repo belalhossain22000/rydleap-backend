@@ -39,4 +39,10 @@ router.get(
   transactionController.getPayout
 );
 
+router.get(
+  "/driver-payout/:driverId",
+  auth(),
+  transactionController.getDriverPayouts
+);
+
 export const transactionRoutes = router;
