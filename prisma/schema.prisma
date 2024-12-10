@@ -57,18 +57,18 @@ model User {
 model UserTransaction {
   id              String        @id @default(auto()) @map("_id") @db.ObjectId
   amount          Int
-  userId          String        @db.ObjectId
-  rideId          String        @db.ObjectId
-  riderId         String        @db.ObjectId
-  orderId         String
+  userId          String?       @db.ObjectId
+  rideId          String?       @db.ObjectId
+  riderId         String?       @db.ObjectId
+  orderId         String?
   url             String?
   status          PaymentStatus @default(PENDING)
   paymentMethod   String
   transactionType String        @default("Ride Fare")
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-  user            User          @relation(fields: [userId], references: [id])
-  ride            Ride          @relation(fields: [rideId], references: [id])
+  user            User?         @relation(fields: [userId], references: [id])
+  ride            Ride?         @relation(fields: [rideId], references: [id])
 
   @@map("UserTransactions")
 }
@@ -80,23 +80,23 @@ model PaymentInfo {
   cvv            Int
   expirationDate String
   country        String
-  userId         String   @db.ObjectId
+  userId         String?  @db.ObjectId
   paymentMethod  String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
-  user           User     @relation(fields: [userId], references: [id])
+  user           User?    @relation(fields: [userId], references: [id])
 
   @@map("paymentInfo")
 }
 
 model PaymentMethod {
   id               String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId           String   @db.ObjectId
+  userId           String?  @db.ObjectId
   paymentMethod    String   @unique
   paymentMethodImg String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  user             User     @relation(fields: [userId], references: [id])
+  user             User?    @relation(fields: [userId], references: [id])
 
   @@map("paymentMethods")
 }
@@ -104,16 +104,16 @@ model PaymentMethod {
 model RiderTransaction {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   amount        Int
-  riderId       String        @db.ObjectId
-  rideId        String        @db.ObjectId
-  userId        String        @db.ObjectId
-  orderId       String        @db.ObjectId
+  riderId       String?       @db.ObjectId
+  rideId        String?       @db.ObjectId
+  userId        String?       @db.ObjectId
+  orderId       String?       @db.ObjectId
   status        PaymentStatus @default(PENDING)
   paymentMethod String
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
-  rider         User          @relation(fields: [riderId], references: [id])
-  ride          Ride          @relation(fields: [rideId], references: [id])
+  rider         User?         @relation(fields: [riderId], references: [id])
+  ride          Ride?         @relation(fields: [rideId], references: [id])
 
   @@map("RiderTransactions")
 }
@@ -129,7 +129,7 @@ model Ride {
   destinationLng   Float
   date             String?
   time             String?
-  packageId        String             @unique @db.ObjectId
+  packageId        String?            @db.ObjectId
   status           RideStatus         @default(PENDING)
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
@@ -145,16 +145,16 @@ model Ride {
 
 model RiderReview {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  rideId     String   @db.ObjectId
-  riderId    String   @unique @db.ObjectId
-  customerId String   @unique @db.ObjectId
+  rideId     String?  @db.ObjectId
+  riderId    String?  @unique @db.ObjectId
+  customerId String?  @unique @db.ObjectId
   rating     Int
   comment    String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  ride       Ride     @relation(fields: [rideId], references: [id])
-  rider      User     @relation("RiderReviewsAsRider", fields: [riderId], references: [id])
-  customer   User     @relation("RiderReviewsAsCustomer", fields: [customerId], references: [id])
+  ride       Ride?    @relation(fields: [rideId], references: [id])
+  rider      User?    @relation("RiderReviewsAsRider", fields: [riderId], references: [id])
+  customer   User?    @relation("RiderReviewsAsCustomer", fields: [customerId], references: [id])
 
   @@map("RiderReviews")
 }
@@ -162,12 +162,12 @@ model RiderReview {
 // user location table
 model UserLocation {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @unique @db.ObjectId
+  userId      String?  @unique @db.ObjectId
   locationLat Float
   locationLng Float
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  user        User     @relation("UserLocation", fields: [userId], references: [id])
+  user        User?    @relation("UserLocation", fields: [userId], references: [id])
 
   @@map("usersLocations")
 }
@@ -197,8 +197,8 @@ model RiderVehicleInfo {
   vehicleRegistrationImage  Json
   vehicleInsuranceImage     Json
   drivingLicenceImage       Json
-  userId                    String   @unique @db.ObjectId
-  user                      User     @relation(fields: [userId], references: [id])
+  userId                    String?  @unique @db.ObjectId
+  user                      User?    @relation(fields: [userId], references: [id])
   createdAt                 DateTime @default(now())
   updatedAt                 DateTime @updatedAt
 
@@ -218,8 +218,8 @@ model Offer {
 
 model RydleapProfile {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  adminId         String   @db.ObjectId
-  admin           User     @relation(fields: [adminId], references: [id])
+  adminId         String?  @db.ObjectId
+  admin           User?    @relation(fields: [adminId], references: [id])
   supportEmail    String
   phoneNumber     String
   address         String
@@ -235,24 +235,24 @@ model RydleapProfile {
 
 model Notifications {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  receiverId String   @db.ObjectId
+  receiverId String?  @db.ObjectId
   title      String
   body       String
   read       Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  user       User     @relation(fields: [receiverId], references: [id])
+  user       User?    @relation(fields: [receiverId], references: [id])
 }
 
 model RiderPayout {
   id            String       @id @default(auto()) @map("_id") @db.ObjectId
-  riderId       String       @db.ObjectId
+  riderId       String?      @db.ObjectId
   amount        Int
   paymentMethod String
   status        PayoutStatus @default(PROCESSED)
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
-  user          User         @relation(fields: [riderId], references: [id])
+  user          User?        @relation(fields: [riderId], references: [id])
 
   @@map("riderPayouts")
 }

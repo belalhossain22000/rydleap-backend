@@ -231,6 +231,10 @@ const getAllRideRequestsFromDb = async (
     orderBy: {
       createdAt: "desc",
     },
+    include: {
+      rider: { select: { fullName: true } },
+      user: { select: { fullName: true } },
+    },
   });
 
   const ongoingRides = await prisma.ride.count({
