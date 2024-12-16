@@ -8,6 +8,6 @@ const router = express.Router();
 router.post("/create", auth(UserRole.ADMIN), invoiceControllers.createInvoice);
 router.get("/", auth(UserRole.ADMIN), invoiceControllers.getAllInvoices);
 router.get("/:id", auth(UserRole.ADMIN), invoiceControllers.getInvoiceById);
-router.get("/:id", auth(UserRole.ADMIN), invoiceControllers.updateInvoice);
+router.put("/:id", auth(UserRole.ADMIN), invoiceControllers.updateInvoice);
 
 export const invoiceRoute = router;
