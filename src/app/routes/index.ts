@@ -17,6 +17,7 @@ import { paymentRoutes } from "../modules/Paypal/paypal.routes";
 import { paymentInfoRoute } from "../modules/PaymentInfo/paymentInfo.routes";
 import { paymentMethodRoute } from "../modules/PaymentMethod/paymentMethod.routes";
 import { transactionRoutes } from "../modules/Transactions/transaction.routes";
+import { invoiceRoute } from "../modules/Invoice/invoice.routes";
 
 const router = express.Router();
 
@@ -90,6 +91,10 @@ const moduleRoutes = [
   {
     path: "/transactions",
     route: transactionRoutes,
+  },
+  {
+    path: "/invoice",
+    route: invoiceRoute,
   },
 ];
 

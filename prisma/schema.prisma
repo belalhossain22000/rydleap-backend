@@ -257,6 +257,23 @@ model RiderPayout {
   @@map("riderPayouts")
 }
 
+model Invoice {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceNo      String
+  issueDate      DateTime
+  dueDate        DateTime
+  invoiceTerms   String
+  billingAddress String
+  paymentMethod  String
+  email          String
+  items          Json
+  totalAmount    Float
+  name           String?
+  perday         Float         @default(0.00)
+  note           String?
+  status         InvoiceStatus @default(PAID)
+}
+
 enum UserRole {
   ADMIN
   RIDER
@@ -290,4 +307,10 @@ enum PaymentStatus {
 enum PayoutStatus {
   COMPLETED
   PROCESSED
+}
+
+enum InvoiceStatus {
+  PAID
+  UNPAID
+  OVERDUE
 }
